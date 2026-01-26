@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.1.8] - 2026-01-27
+
+- Added derived address formatting from structured components when formatted value is missing.
+
 ## [0.1.7] - 2026-01-27
 
 - Improved VAT period mapping and current status selection from ANAF payloads.

@@ -365,6 +365,7 @@ class AnafDriver implements RoCompanyLookupDriver
         foreach ($entries as $entry) {
             if ($latest === null) {
                 $latest = $entry;
+
                 continue;
             }
 
@@ -373,6 +374,7 @@ class AnafDriver implements RoCompanyLookupDriver
 
             if ($latestStart === null) {
                 $latest = $entry;
+
                 continue;
             }
 
@@ -488,28 +490,133 @@ class AnafDriver implements RoCompanyLookupDriver
         $isD = array_key_exists('ddenumire_Judet', $address);
         $isS = array_key_exists('sdenumire_Judet', $address);
 
+        $country = $this->firstValue($address, ['tara', 'country', 'dtara', 'stara']);
+        $county = $this->firstValue($address, ['judet', 'county', 'ddenumire_Judet', 'sdenumire_Judet']);
+        $city = $this->firstValue($address, ['localitate', 'oras', 'city', 'ddenumire_Localitate', 'sdenumire_Localitate']);
+        $subLocality = $this->firstValue($address, ['sub_localitate']);
+        $sector = $this->firstValue($address, ['sector']);
+        $street = $this->firstValue($address, ['strada', 'street', 'ddenumire_Strada', 'sdenumire_Strada']);
+        $streetType = $this->firstValue($address, ['tip_strada']);
+        $number = $this->firstValue($address, ['numar', 'number', 'dnumar_Strada', 'snumar_Strada']);
+        $building = $this->firstValue($address, ['bloc', 'building']);
+        $entrance = $this->firstValue($address, ['scara', 'entrance']);
+        $floor = $this->firstValue($address, ['etaj', 'floor']);
+        $apartment = $this->firstValue($address, ['apartament', 'apartment']);
+        $postalCode = $this->firstValue($address, ['cod_postal', 'postal_code', 'dcod_Postal', 'scod_Postal']);
+        $sirutaCode = $this->firstValue($address, ['cod_siruta', 'dcod_Localitate', 'scod_Localitate']);
+        $source = $this->firstValue($address, ['sursa']);
+
+        if ($formatted === null) {
+            $formatted = $this->formatAddressFromParts(
+                country: $country,
+                county: $county,
+                city: $city,
+                subLocality: $subLocality,
+                sector: $sector,
+                street: $street,
+                streetType: $streetType,
+                number: $number,
+                building: $building,
+                entrance: $entrance,
+                floor: $floor,
+                apartment: $apartment,
+                postalCode: $postalCode
+            );
+        }
+
         return new AddressData(
             formatted: $formatted,
             raw: $raw,
             raw_mf: $rawMf,
             raw_recom: $rawRecom,
-            country: $this->firstValue($address, ['tara', 'country', 'dtara', 'stara']),
-            county: $this->firstValue($address, ['judet', 'county', 'ddenumire_Judet', 'sdenumire_Judet']),
-            city: $this->firstValue($address, ['localitate', 'oras', 'city', 'ddenumire_Localitate', 'sdenumire_Localitate']),
-            sub_locality: $this->firstValue($address, ['sub_localitate']),
-            sector: $this->firstValue($address, ['sector']),
-            street: $this->firstValue($address, ['strada', 'street', 'ddenumire_Strada', 'sdenumire_Strada']),
-            street_type: $this->firstValue($address, ['tip_strada']),
-            number: $this->firstValue($address, ['numar', 'number', 'dnumar_Strada', 'snumar_Strada']),
-            building: $this->firstValue($address, ['bloc', 'building']),
-            entrance: $this->firstValue($address, ['scara', 'entrance']),
-            floor: $this->firstValue($address, ['etaj', 'floor']),
-            apartment: $this->firstValue($address, ['apartament', 'apartment']),
-            postal_code: $this->firstValue($address, ['cod_postal', 'postal_code', 'dcod_Postal', 'scod_Postal']),
-            siruta_code: $this->firstValue($address, ['cod_siruta', 'dcod_Localitate', 'scod_Localitate']),
-            source: $this->firstValue($address, ['sursa']),
+            country: $country,
+            county: $county,
+            city: $city,
+            sub_locality: $subLocality,
+            sector: $sector,
+            street: $street,
+            street_type: $streetType,
+            number: $number,
+            building: $building,
+            entrance: $entrance,
+            floor: $floor,
+            apartment: $apartment,
+            postal_code: $postalCode,
+            siruta_code: $sirutaCode,
+            source: $source,
             expiration: $expiration
         );
+    }
+
+    protected function formatAddressFromParts(
+        ?string $country,
+        ?string $county,
+        ?string $city,
+        ?string $subLocality,
+        ?string $sector,
+        ?string $street,
+        ?string $streetType,
+        ?string $number,
+        ?string $building,
+        ?string $entrance,
+        ?string $floor,
+        ?string $apartment,
+        ?string $postalCode
+    ): ?string {
+        $parts = [];
+
+        if ($street !== null) {
+            $streetLabel = $streetType ? trim($streetType.' '.$street) : $street;
+            $parts[] = $streetLabel;
+        }
+
+        if ($number !== null) {
+            $parts[] = 'Nr. '.$number;
+        }
+
+        if ($building !== null) {
+            $parts[] = 'Bloc '.$building;
+        }
+
+        if ($entrance !== null) {
+            $parts[] = 'Sc. '.$entrance;
+        }
+
+        if ($floor !== null) {
+            $parts[] = 'Et. '.$floor;
+        }
+
+        if ($apartment !== null) {
+            $parts[] = 'Ap. '.$apartment;
+        }
+
+        if ($sector !== null) {
+            $parts[] = 'Sector '.$sector;
+        }
+
+        if ($city !== null) {
+            $parts[] = $city;
+        }
+
+        if ($subLocality !== null) {
+            $parts[] = $subLocality;
+        }
+
+        if ($county !== null) {
+            $parts[] = 'Judet '.$county;
+        }
+
+        if ($postalCode !== null) {
+            $parts[] = $postalCode;
+        }
+
+        if ($country !== null) {
+            $parts[] = $country;
+        }
+
+        $parts = array_values(array_filter($parts, static fn (?string $value) => $value !== null && $value !== ''));
+
+        return count($parts) > 0 ? implode(', ', $parts) : null;
     }
 
     protected function mapExpiration(mixed $expiration): ?AddressExpirationData
