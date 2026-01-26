@@ -7,7 +7,7 @@
 [![License](https://img.shields.io/packagist/l/valsis/ro-company-lookup.svg?style=flat-square)](LICENSE)
 
 A production-ready Laravel package that retrieves basic Romanian company data by CUI from ANAF public web services.
-Current version: `v0.1.0`.
+Current version: `v0.1.1`.
 
 ## Requirements
 
@@ -95,6 +95,14 @@ The command outputs JSON to stdout.
 
 ```bash
 composer test
+```
+
+Other useful scripts:
+
+```bash
+composer lint
+composer analyse
+composer ci
 ```
 
 ## Troubleshooting
