@@ -26,7 +26,7 @@ If no date is provided, the package uses "today" in the configured timezone.
 ```
 
 Romanian output follows the Termene.ro structure (`adresa`, `cod_caen`, `date_contact`, `forma_juridica`, `statut_tva`).
-English output provides professional translations while preserving the same structure.
+English output provides professional translations with matching structure (e.g., `address`, `caen_code`, `contact_details`, `legal_form`, `vat_status`).
 
 ## Raw payload
 
