@@ -76,8 +76,8 @@ Example output (RO):
   "firma": {
     "cui": 33034700,
     "j": "J2014000546297",
-    "nume_mfinante": "TERMENE JUST SRL",
-    "nume_recom": "TERMENE JUST SRL"
+    "nume_mfinante": "ACME SRL",
+    "nume_recom": "ACME SRL"
   },
   "adresa": {
     "anaf": {
@@ -124,8 +124,8 @@ Example output (EN):
   "company": {
     "cui": 33034700,
     "trade_register_number": "J2014000546297",
-    "ministry_of_finance_name": "TERMENE JUST SRL",
-    "recom_name": "TERMENE JUST SRL"
+    "ministry_of_finance_name": "ACME SRL",
+    "recom_name": "ACME SRL"
   },
   "address": {
     "anaf": {

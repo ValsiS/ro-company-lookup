@@ -21,8 +21,8 @@ The package returns `CompanySimpleData` (spatie/laravel-data). Output keys are m
   "firma": {
     "cui": 33034700,
     "j": "J2014000546297",
-    "nume_mfinante": "TERMENE JUST SRL",
-    "nume_recom": "TERMENE JUST SRL"
+    "nume_mfinante": "ACME SRL",
+    "nume_recom": "ACME SRL"
   },
   "forma_juridica": {
     "curenta": { "data_actualizare": "2018-10-12T00:00:00Z", "denumire": "...", "organizare": "SRL" },
@@ -70,8 +70,8 @@ Versioned JSON Schemas are available in:
   "company": {
     "cui": 33034700,
     "trade_register_number": "J2014000546297",
-    "ministry_of_finance_name": "TERMENE JUST SRL",
-    "recom_name": "TERMENE JUST SRL"
+    "ministry_of_finance_name": "ACME SRL",
+    "recom_name": "ACME SRL"
   },
   "legal_form": {
     "current": { "updated_at": "2018-10-12T00:00:00Z", "name": "...", "organization": "SRL" },
