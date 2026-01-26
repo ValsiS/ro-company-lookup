@@ -251,6 +251,14 @@ php artisan ro-company-lookup:check 123456 --date=2024-01-10 --raw
 
 The command outputs JSON to stdout.
 
+You can also run a compact demo summary:
+
+```bash
+php artisan ro-company-lookup:demo 123456
+```
+
+The demo command prints just the core fields (exists, name, CUI, CAEN, registration date, VAT payer).
+
 ## Testing
 
 ```bash

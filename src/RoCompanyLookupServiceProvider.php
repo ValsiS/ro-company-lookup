@@ -7,6 +7,7 @@ namespace Valsis\RoCompanyLookup;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 use Valsis\RoCompanyLookup\Console\CheckCompanyCommand;
+use Valsis\RoCompanyLookup\Console\DemoCompanyCommand;
 
 class RoCompanyLookupServiceProvider extends PackageServiceProvider
 {
@@ -15,7 +16,10 @@ class RoCompanyLookupServiceProvider extends PackageServiceProvider
         $package
             ->name('ro-company-lookup')
             ->hasConfigFile('ro-company-lookup')
-            ->hasCommand(CheckCompanyCommand::class);
+            ->hasCommands([
+                CheckCompanyCommand::class,
+                DemoCompanyCommand::class,
+            ]);
     }
 
     public function packageRegistered(): void

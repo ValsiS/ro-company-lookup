@@ -22,6 +22,7 @@ All configuration lives in `config/ro-company-lookup.php`.
 
 - `cache_store`: null for default store or a named store
 - `cache_prefix`: prefix for cache keys
+- `cache_version`: cache version segment for safe invalidation
 - `cache_ttl_seconds`: TTL for fresh cache
 - `stale_ttl_seconds`: optional stale fallback window
 - `use_locks`: enable cache lock single-flight
@@ -38,6 +39,14 @@ All configuration lives in `config/ro-company-lookup.php`.
 - `logging.enabled`: enable PSR-3 logging
 - `logging.channel`: optional log channel
 - `logging.level`: log level (default `info`)
+
+## Schema audit
+
+- `schema_audit.enabled`: enable unknown-key detection
+- `schema_audit.fail_on_unknown`: throw when unknown keys are found
+- `schema_audit.snapshot_path`: directory to write JSON snapshots (optional)
+- `schema_audit.channel`: log channel override
+- `schema_audit.level`: log level (default `warning`)
 
 ## Circuit breaker
 

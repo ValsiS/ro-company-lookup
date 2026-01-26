@@ -8,6 +8,7 @@ use DateTimeInterface;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Spatie\LaravelData\DataCollection;
@@ -217,8 +218,6 @@ class AnafDriver implements RoCompanyLookupDriver
      */
     protected function mapEntry(array $entry, int $cui): CompanySimpleData
     {
-        $this->auditEntry($entry);
-
         $general = is_array($entry['date_generale'] ?? null) ? $entry['date_generale'] : null;
         $name = $this->firstValue($general ?? $entry, ['denumire', 'nume', 'name']);
         $nrRegCom = $this->firstValue($general ?? $entry, ['nrRegCom', 'nr_reg_com', 'nr_reg_comert']);
@@ -255,6 +254,7 @@ class AnafDriver implements RoCompanyLookupDriver
             ?? Arr::get($entry, 'vat')
             ?? Arr::get($entry, 'inregistrare_scop_Tva');
         $queriedAt = DateHelper::parseDate($this->firstValue($general ?? $entry, ['data', 'data_interogare']));
+        $this->auditEntry($entry, $cui, $queriedAt);
         $vat = $this->mapVat($vatData, $queriedAt);
 
         $domiciliuRaw = Arr::get($entry, 'domiciliu_fiscal')
@@ -287,7 +287,7 @@ class AnafDriver implements RoCompanyLookupDriver
     /**
      * @param  array<string, mixed>  $entry
      */
-    protected function auditEntry(array $entry): void
+    protected function auditEntry(array $entry, int $cui, ?\DateTimeImmutable $queriedAt): void
     {
         if (! config('ro-company-lookup.schema_audit.enabled', false)) {
             return;
@@ -305,8 +305,32 @@ class AnafDriver implements RoCompanyLookupDriver
 
         if ($logger !== null) {
             $logger->log($level, 'ANAF payload contains unknown keys.', [
+                'cui' => $cui,
+                'queried_at' => $queriedAt?->format(DATE_ATOM),
                 'unknown' => $unknown,
             ]);
+        }
+
+        $snapshotPath = config('ro-company-lookup.schema_audit.snapshot_path');
+        if (is_string($snapshotPath) && $snapshotPath !== '') {
+            $payload = [
+                'cui' => $cui,
+                'queried_at' => $queriedAt?->format(DATE_ATOM),
+                'unknown' => $unknown,
+                'entry' => $entry,
+            ];
+
+            File::ensureDirectoryExists($snapshotPath);
+
+            $filename = sprintf(
+                '%s/anaf-schema-%s-%s.json',
+                rtrim($snapshotPath, '/'),
+                $cui,
+                DateHelper::now()->format('YmdHis')
+            );
+
+            $snapshot = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            File::put($filename, $snapshot ?: '');
         }
 
         if (config('ro-company-lookup.schema_audit.fail_on_unknown', false)) {

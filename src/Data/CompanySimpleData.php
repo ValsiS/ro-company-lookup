@@ -20,4 +20,14 @@ class CompanySimpleData extends Data
         public VatStatusData $vat,
         public MetaData $meta
     ) {}
+
+    public function isVatPayer(): ?bool
+    {
+        return $this->vat->isPayer();
+    }
+
+    public function registrationDate(): ?\DateTimeImmutable
+    {
+        return $this->company->profile?->registration_date;
+    }
 }

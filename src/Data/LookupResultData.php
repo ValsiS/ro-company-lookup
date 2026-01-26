@@ -43,4 +43,19 @@ class LookupResultData extends Data
     {
         return new self(self::STATUS_ERROR, null, $error, $message, $code);
     }
+
+    public function isOk(): bool
+    {
+        return $this->status === self::STATUS_OK;
+    }
+
+    public function isNotFound(): bool
+    {
+        return $this->status === self::STATUS_NOT_FOUND;
+    }
+
+    public function exists(): bool
+    {
+        return $this->status === self::STATUS_OK;
+    }
 }

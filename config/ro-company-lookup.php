@@ -40,6 +40,7 @@ return [
     'schema_audit' => [
         'enabled' => false,
         'fail_on_unknown' => false,
+        'snapshot_path' => null,
         'channel' => null,
         'level' => 'warning',
     ],

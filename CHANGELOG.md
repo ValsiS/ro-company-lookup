@@ -10,6 +10,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Added company profile data derived from ANAF general information.
 - Added contract test for v9 payload profile mapping.
+- Added compact demo command and convenience helpers (VAT payer, registration date).
+- Added schema audit snapshots for unknown payload keys.
 
 ## [0.1.9] - 2026-01-27
 
