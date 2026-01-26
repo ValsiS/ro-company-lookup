@@ -58,6 +58,54 @@ Full documentation is available in the repo wiki pages under `docs/wiki`. Start 
 
 Output follows the Termene.ro structure as closely as possible (e.g., `firma`, `adresa`, `cod_caen`, `date_contact`, `forma_juridica`, `statut_tva`). Use the `language` config to switch between `ro` and `en` output keys. Internally you can still access properties using the original PHP property names.
 
+Example output (RO):
+
+```json
+{
+  "firma": {
+    "cui": 33034700,
+    "j": "J2014000546297",
+    "nume_mfinante": "TERMENE JUST SRL",
+    "nume_recom": "TERMENE JUST SRL"
+  },
+  "adresa": {
+    "anaf": {
+      "formatat": "Strada Nicolae Titulescu, Nr. 32, Ploiești, Județ Prahova",
+      "judet": "Prahova",
+      "localitate": "Ploiești"
+    },
+    "sediu_social": {
+      "formatat": "Strada Nicolae Titulescu, Nr. 32, Ploiești, Județ Prahova",
+      "judet": "Prahova",
+      "localitate": "Ploiești"
+    }
+  },
+  "cod_caen": {
+    "principal_mfinante": { "cod": "6311", "label": "Prelucrarea datelor..." },
+    "principal_recom": { "cod": "6310", "label": "Prelucrarea datelor...", "versiune": 3 }
+  },
+  "date_contact": {
+    "telefon": ["0344803100"],
+    "email": []
+  },
+  "forma_juridica": {
+    "curenta": { "data_actualizare": "2018-10-12T00:00:00Z", "denumire": "Societate cu Răspundere Limitată", "organizare": "SRL" },
+    "istoric": []
+  },
+  "statut_tva": {
+    "curent": { "cod": 2, "label": "Plătitor TVA", "data_interogare": "2026-01-26" },
+    "istoric": []
+  },
+  "meta": {
+    "sursa": "anaf",
+    "data_interogare": "2026-01-26T10:00:00Z",
+    "data_ceruta": "2026-01-26",
+    "este_stale": false,
+    "cache_hit": true
+  }
+}
+```
+
 ### Batch lookup
 
 ```php
