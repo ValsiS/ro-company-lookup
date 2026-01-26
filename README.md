@@ -41,6 +41,7 @@ Config options include timeouts, retries, cache TTL, stale TTL, and raw payload 
 - `timezone` (default `Europe/Bucharest`)
 - `language` (`ro` or `en` for output field naming)
 - `use_locks` to toggle cache locks for single-flight protection
+- `cache_version` to force a cache bust across all keys
 - `batch_max_size` and `batch_chunk_size` for batching behavior
 - `logging` for PSR-3 request/response metadata logging
 - `circuit_breaker` for cooldown after repeated 5xx responses
@@ -214,6 +215,7 @@ You can also include raw data per command call with `--raw`.
 - Results are cached by driver + CUI + date.
 - Default cache TTL is 24 hours.
 - When a request fails and a stale cache entry exists (within the configured stale TTL), the stale entry is returned with `meta.is_stale = true`.
+- Bump `cache_version` to invalidate existing cache entries after a mapping change.
 - Retries use exponential backoff and only trigger on 429 and 5xx responses.
 - Circuit breaker (optional) opens after repeated 5xx responses and cools down for a configurable interval.
 

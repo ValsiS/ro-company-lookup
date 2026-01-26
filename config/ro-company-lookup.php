@@ -19,6 +19,7 @@ return [
 
     'cache_store' => null,
     'cache_prefix' => 'ro-company-lookup',
+    'cache_version' => 'v1',
     'cache_ttl_seconds' => 60 * 60 * 24,
     'stale_ttl_seconds' => 60 * 60 * 24 * 7,
     'use_locks' => true,

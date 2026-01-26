@@ -45,6 +45,8 @@ class RoCompanyLookupManager extends Manager
         /** @var \Illuminate\Contracts\Cache\Repository $cache */
         $cache = cache()->store($cacheStore);
         $cachePrefix = config('ro-company-lookup.cache_prefix', 'ro-company-lookup');
+        $cacheVersion = config('ro-company-lookup.cache_version', 'v1');
+        $cachePrefix = sprintf('%s:%s', $cachePrefix, $cacheVersion);
 
         $cacheKey = CacheKey::forLookup($cachePrefix, $driverName, $normalizedCui, $dateString);
         $lockKey = CacheKey::forLock($cachePrefix, $driverName, $normalizedCui, $dateString);
@@ -258,6 +260,8 @@ class RoCompanyLookupManager extends Manager
         /** @var \Illuminate\Contracts\Cache\Repository $cache */
         $cache = cache()->store($cacheStore);
         $cachePrefix = config('ro-company-lookup.cache_prefix', 'ro-company-lookup');
+        $cacheVersion = config('ro-company-lookup.cache_version', 'v1');
+        $cachePrefix = sprintf('%s:%s', $cachePrefix, $cacheVersion);
         $cacheTtl = (int) config('ro-company-lookup.cache_ttl_seconds', 86400);
         $staleTtl = (int) config('ro-company-lookup.stale_ttl_seconds', 0);
         $includeRaw = (bool) config('ro-company-lookup.enable_raw', false);
