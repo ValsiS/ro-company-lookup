@@ -1,6 +1,7 @@
 # Ro Company Lookup
 
 [![Tests](https://github.com/ValsiS/ro-company-lookup/actions/workflows/run-tests.yml/badge.svg)](https://github.com/ValsiS/ro-company-lookup/actions/workflows/run-tests.yml)
+[![Validate](https://img.shields.io/github/actions/workflow/status/ValsiS/ro-company-lookup/run-tests.yml?branch=main&label=validate&style=flat-square)](https://github.com/ValsiS/ro-company-lookup/actions/workflows/run-tests.yml)
 [![Latest Version](https://img.shields.io/github/v/release/ValsiS/ro-company-lookup.svg?style=flat-square)](https://github.com/ValsiS/ro-company-lookup/releases)
 [![PHP Version](https://img.shields.io/badge/php-8.3%2B-8892BF.svg?style=flat-square)](https://www.php.net/)
 [![Total Downloads](https://img.shields.io/github/downloads/ValsiS/ro-company-lookup/total.svg?style=flat-square)](https://github.com/ValsiS/ro-company-lookup/releases)
@@ -118,6 +119,11 @@ Please see [CHANGELOG.md](CHANGELOG.md) for more information on what has changed
 ## Contributing
 
 Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+We use Dependabot for dependency updates.
+
+## Code of Conduct
+
+Please see [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for details.
 
 ## Security
 
