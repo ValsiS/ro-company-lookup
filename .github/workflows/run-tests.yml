@@ -31,6 +31,9 @@ jobs:
       - name: Check formatting
         run: vendor/bin/pint --test
 
+      - name: Validate composer.json
+        run: composer validate --strict
+
       - name: Run tests with coverage
         run: |
           mkdir -p build/logs
@@ -41,5 +44,12 @@ jobs:
 
       - name: Run static analysis
         run: composer analyse
-      - name: Validate composer.json
-        run: composer validate --strict
+
+  run-tests:
+    runs-on: ubuntu-latest
+    needs: tests
+    if: ${{ success() }}
+
+    steps:
+      - name: Matrix summary
+        run: echo "All matrix jobs passed."
