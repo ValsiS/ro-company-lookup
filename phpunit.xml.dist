@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit bootstrap="vendor/autoload.php"
          colors="true"
-         stopOnFailure="false">
+         stopOnFailure="false"
+         failOnWarning="true"
+         failOnDeprecation="true">
     <testsuites>
         <testsuite name="Package">
             <directory>tests</directory>

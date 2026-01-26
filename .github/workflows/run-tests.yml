@@ -41,3 +41,5 @@ jobs:
 
       - name: Run static analysis
         run: composer analyse
+      - name: Validate composer.json
+        run: composer validate --strict
