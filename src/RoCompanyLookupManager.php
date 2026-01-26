@@ -147,7 +147,7 @@ class RoCompanyLookupManager extends Manager
             $this->applyVatQueryDate($data->vat, $fetchedAt);
 
             if ($includeRaw || config('ro-company-lookup.enable_raw', false)) {
-                $data->meta->raw = $response->raw;
+                $data->meta->raw = $response->raw ?? [];
             }
 
             $cache->put($cacheKey, [
@@ -401,7 +401,7 @@ class RoCompanyLookupManager extends Manager
         $data->meta->queried_for_date = $dateString;
 
         if ($includeRaw || config('ro-company-lookup.enable_raw', false)) {
-            $data->meta->raw = $raw;
+            $data->meta->raw = $raw ?? [];
         }
 
         return [
