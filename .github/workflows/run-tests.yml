@@ -41,5 +41,14 @@ jobs:
 
       - name: Run static analysis
         run: composer analyse
+
+  run-tests:
+    runs-on: ubuntu-latest
+    needs: tests
+    if: ${{ success() }}
+
+    steps:
+      - name: Matrix summary
+        run: echo "All matrix jobs passed."
       - name: Validate composer.json
         run: composer validate --strict
