@@ -15,6 +15,7 @@ class FirmaData extends Data
         public int $cui,
         public ?string $registration_number,
         public ?string $name_mfinante,
-        public ?string $name_recom
+        public ?string $name_recom,
+        public ?CompanyProfileData $profile = null
     ) {}
 }

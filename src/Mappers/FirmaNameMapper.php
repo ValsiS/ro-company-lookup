@@ -11,6 +11,7 @@ final class FirmaNameMapper extends AbstractLanguageNameMapper
         'registration_number' => 'j',
         'name_mfinante' => 'nume_mfinante',
         'name_recom' => 'nume_recom',
+        'profile' => 'profil',
     ];
 
     protected array $en = [
@@ -18,5 +19,6 @@ final class FirmaNameMapper extends AbstractLanguageNameMapper
         'registration_number' => 'trade_register_number',
         'name_mfinante' => 'ministry_of_finance_name',
         'name_recom' => 'recom_name',
+        'profile' => 'profile',
     ];
 }

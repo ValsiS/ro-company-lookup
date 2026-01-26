@@ -58,6 +58,22 @@ class ContractMappingTest extends TestCase
         $this->assertNull($result->company->name_mfinante);
     }
 
+    #[Test]
+    public function it_maps_company_profile_from_v9_payload(): void
+    {
+        Http::fake([
+            'webservicesp.anaf.ro/*' => Http::response($this->fixture('anaf_v9_single.json'), 200),
+        ]);
+
+        $result = RoCompanyLookup::lookup('RO46632129');
+
+        $this->assertSame(46632129, $result->company->cui);
+        $this->assertSame('TERRADOT S.R.L.', $result->company->name_mfinante);
+        $this->assertNotNull($result->company->profile);
+        $this->assertSame('INREGISTRAT din data 10.08.2022', $result->company->profile->registration_status);
+        $this->assertSame('2022-08-11', $result->company->profile->registration_date?->format('Y-m-d'));
+    }
+
     /**
      * @return array<string, mixed>
      */

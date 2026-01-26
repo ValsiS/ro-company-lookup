@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-01-27
+
+- Added company profile data derived from ANAF general information.
+- Added contract test for v9 payload profile mapping.
+
 ## [0.1.9] - 2026-01-27
 
 - Added schema audit for ANAF payloads with optional logging and fail-fast mode.

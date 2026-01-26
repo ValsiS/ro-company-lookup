@@ -17,6 +17,7 @@ use Valsis\RoCompanyLookup\Data\AddressExpirationData;
 use Valsis\RoCompanyLookup\Data\AddressSetData;
 use Valsis\RoCompanyLookup\Data\CaenEntryData;
 use Valsis\RoCompanyLookup\Data\CaenSetData;
+use Valsis\RoCompanyLookup\Data\CompanyProfileData;
 use Valsis\RoCompanyLookup\Data\CompanySimpleData;
 use Valsis\RoCompanyLookup\Data\ContactData;
 use Valsis\RoCompanyLookup\Data\FirmaData;
@@ -223,11 +224,14 @@ class AnafDriver implements RoCompanyLookupDriver
         $nrRegCom = $this->firstValue($general ?? $entry, ['nrRegCom', 'nr_reg_com', 'nr_reg_comert']);
         $caen = $this->firstValue($general ?? $entry, ['cod_CAEN', 'cod_caen', 'caen']);
 
+        $profile = $this->mapProfile($general);
+
         $company = new FirmaData(
             cui: $cui,
             registration_number: $nrRegCom,
             name_mfinante: $name,
-            name_recom: $name
+            name_recom: $name,
+            profile: $profile
         );
 
         $caenEntry = $caen ? new CaenEntryData(code: $caen, label: null, version: null) : null;
@@ -308,6 +312,46 @@ class AnafDriver implements RoCompanyLookupDriver
         if (config('ro-company-lookup.schema_audit.fail_on_unknown', false)) {
             throw new LookupFailedException('ANAF payload contains unknown keys.');
         }
+    }
+
+    /**
+     * @param  array<string, mixed>|null  $general
+     */
+    protected function mapProfile(?array $general): ?CompanyProfileData
+    {
+        if (! is_array($general)) {
+            return null;
+        }
+
+        $registrationDate = DateHelper::parseDate($this->firstValue($general, ['data_inregistrare']));
+        $registrationStatus = $this->firstValue($general, ['stare_inregistrare']);
+        $fiscalOffice = $this->firstValue($general, ['organFiscalCompetent']);
+        $ownershipForm = $this->firstValue($general, ['forma_de_proprietate']);
+        $eInvoiceStatus = $this->normalizeBool($general['statusRO_e_Factura'] ?? null);
+        $eInvoiceRegistrationDate = DateHelper::parseDate($this->firstValue($general, ['data_inreg_Reg_RO_e_Factura']));
+        $iban = $this->firstValue($general, ['iban']);
+
+        if (
+            $registrationDate === null
+            && $registrationStatus === null
+            && $fiscalOffice === null
+            && $ownershipForm === null
+            && $eInvoiceStatus === null
+            && $eInvoiceRegistrationDate === null
+            && $iban === null
+        ) {
+            return null;
+        }
+
+        return new CompanyProfileData(
+            registration_date: $registrationDate,
+            registration_status: $registrationStatus,
+            fiscal_office: $fiscalOffice,
+            ownership_form: $ownershipForm,
+            e_invoice_status: $eInvoiceStatus,
+            e_invoice_registration_date: $eInvoiceRegistrationDate,
+            iban: $iban
+        );
     }
 
     /**

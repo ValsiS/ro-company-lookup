@@ -1,0 +1,63 @@
+{
+  "found": [
+    {
+      "date_generale": {
+        "data": "2026-01-27",
+        "cui": 46632129,
+        "denumire": "TERRADOT S.R.L.",
+        "adresa": "JUD. DOLJ, MUN. CRAIOVA, STR. PIATRA NEAMŢ, NR.26",
+        "telefon": "",
+        "fax": "",
+        "codPostal": "",
+        "act": "",
+        "stare_inregistrare": "INREGISTRAT din data 10.08.2022",
+        "data_inreg_Reg_RO_e_Factura": "",
+        "organFiscalCompetent": "Administraţia Judeţeană a Finanţelor Publice Dolj",
+        "forma_de_proprietate": "PROPR.PRIVATA-CAPITAL PRIVAT AUTOHTON",
+        "forma_organizare": "PERSOANA JURIDICA",
+        "forma_juridica": "SOCIETATE COMERCIALĂ CU RĂSPUNDERE LIMITATĂ",
+        "statusRO_e_Factura": false,
+        "data_inregistrare": "2022-08-11",
+        "nrRegCom": "J2022002206167",
+        "cod_CAEN": "6310",
+        "iban": ""
+      },
+      "inregistrare_scop_Tva": {
+        "scpTVA": true,
+        "perioade_TVA": [
+          {
+            "data_inceput_ScpTVA": "2023-05-01",
+            "data_sfarsit_ScpTVA": "",
+            "data_anul_imp_ScpTVA": "",
+            "mesaj_ScpTVA": ""
+          }
+        ]
+      },
+      "adresa_sediu_social": {
+        "stara": "",
+        "sdenumire_Localitate": "Mun. Craiova",
+        "sdenumire_Strada": "Str. Piatra Neamţ",
+        "snumar_Strada": "26",
+        "scod_Localitate": "129",
+        "sdenumire_Judet": "DOLJ",
+        "scod_Judet": "16",
+        "scod_JudetAuto": "DJ",
+        "sdetalii_Adresa": "",
+        "scod_Postal": ""
+      },
+      "adresa_domiciliu_fiscal": {
+        "dtara": "",
+        "ddenumire_Localitate": "Mun. Craiova",
+        "ddenumire_Strada": "Str. Piatra Neamţ",
+        "dnumar_Strada": "26",
+        "dcod_Localitate": "129",
+        "ddenumire_Judet": "DOLJ",
+        "dcod_Judet": "16",
+        "dcod_JudetAuto": "DJ",
+        "ddetalii_Adresa": "",
+        "dcod_Postal": ""
+      }
+    }
+  ],
+  "notFound": []
+}
