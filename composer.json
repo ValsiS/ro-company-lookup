@@ -48,11 +48,11 @@
         "format": "vendor/bin/pint",
         "lint": "vendor/bin/pint --test",
         "test": "vendor/bin/phpunit",
-        "validate": "composer validate --strict",
+        "composer:validate": "composer validate --strict",
         "analyse": "vendor/bin/phpstan analyse --memory-limit=1G",
         "ci": [
             "@lint",
-            "@validate",
+            "@composer:validate",
             "@analyse",
             "@test"
         ]
