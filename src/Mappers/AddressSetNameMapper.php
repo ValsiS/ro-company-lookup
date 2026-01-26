@@ -12,7 +12,7 @@ final class AddressSetNameMapper extends AbstractLanguageNameMapper
     ];
 
     protected array $en = [
-        'anaf' => 'tax_authority',
+        'anaf' => 'anaf',
         'registered_office' => 'registered_office',
     ];
 }

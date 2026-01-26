@@ -17,8 +17,8 @@ final class MetaNameMapper extends AbstractLanguageNameMapper
 
     protected array $en = [
         'source' => 'source',
-        'fetched_at' => 'fetched_at',
-        'queried_for_date' => 'requested_date',
+        'fetched_at' => 'queried_at',
+        'queried_for_date' => 'queried_for_date',
         'is_stale' => 'is_stale',
         'cache_hit' => 'cache_hit',
         'raw' => 'raw',

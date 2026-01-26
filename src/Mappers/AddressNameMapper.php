@@ -33,7 +33,7 @@ final class AddressNameMapper extends AbstractLanguageNameMapper
         'formatted' => 'formatted_address',
         'raw' => 'raw_address',
         'raw_mf' => 'raw_ministry_of_finance',
-        'raw_recom' => 'raw_recom_address',
+        'raw_recom' => 'raw_recom',
         'country' => 'country',
         'county' => 'county',
         'city' => 'city',
