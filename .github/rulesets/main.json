@@ -34,7 +34,11 @@
         "strict_required_status_checks_policy": true,
         "required_status_checks": [
           {
-            "context": "run-tests",
+            "context": "tests (8.3)",
+            "integration_id": null
+          },
+          {
+            "context": "tests (8.5)",
             "integration_id": null
           }
         ]
