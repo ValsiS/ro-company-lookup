@@ -44,3 +44,15 @@ The package throws typed exceptions:
 - `InvalidCuiException` for invalid input
 - `LookupFailedException` for upstream errors
 - `CircuitOpenException` when the circuit breaker is open
+
+## Soft lookups (no exceptions)
+
+Use `tryLookup()` to return a typed result instead of throwing:
+
+```php
+$result = RoCompanyLookup::tryLookup('RO123456');
+
+if ($result->status === 'ok') {
+    $company = $result->data;
+}
+```

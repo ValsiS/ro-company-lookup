@@ -53,6 +53,14 @@ Versioned JSON Schemas are available in:
 - `docs/schemas/company-simple.ro.v1.json`
 - `docs/schemas/company-simple.en.v1.json`
 
+## LookupResultData
+
+`tryLookup()` returns a `LookupResultData` object with:
+
+- `status`: `ok`, `not_found`, `invalid`, or `error`
+- `data`: `CompanySimpleData` when `status` is `ok` or `not_found`
+- `error`, `message`, `error_code` when `status` is `invalid` or `error`
+
 ```json
 {
   "address": {
