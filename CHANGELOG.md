@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-01-26
+
+- Added soft lookup API (`tryLookup`) and soft batch results (`tryGet`) with `LookupResultData`.
+- Updated ANAF endpoint to v9.
+- Added circuit breaker, logging hooks, and JSON schema docs.
+- Added contract tests and expanded fixtures.
+- CI improvements: coverage gate, composer validation, run-tests summary job, and ruleset updates.
+- Documentation updates and example responses.
+
 ## [0.1.0] - 2026-01-26
 
 - Initial release: ANAF driver, DTOs, caching, retries, batching, console command, and test suite.
