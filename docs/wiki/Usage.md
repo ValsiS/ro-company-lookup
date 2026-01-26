@@ -36,3 +36,11 @@ English output provides professional translations with matching structure (e.g.,
 ```
 
 This adds `meta.raw` with the original ANAF payload.
+
+## Errors and exceptions
+
+The package throws typed exceptions:
+
+- `InvalidCuiException` for invalid input
+- `LookupFailedException` for upstream errors
+- `CircuitOpenException` when the circuit breaker is open

@@ -15,6 +15,13 @@ Current version: `v0.1.1`.
 - PHP 8.3+
 - Laravel 12+
 
+## Compatibility
+
+| PHP | Laravel | CI |
+| --- | --- | --- |
+| 8.3 | 12.x | [![PHP 8.3](https://img.shields.io/github/actions/workflow/status/ValsiS/ro-company-lookup/run-tests.yml?branch=main&label=php%208.3&style=flat-square)](https://github.com/ValsiS/ro-company-lookup/actions/workflows/run-tests.yml) |
+| 8.5 | 12.x | [![PHP 8.5](https://img.shields.io/github/actions/workflow/status/ValsiS/ro-company-lookup/run-tests.yml?branch=main&label=php%208.5&style=flat-square)](https://github.com/ValsiS/ro-company-lookup/actions/workflows/run-tests.yml) |
+
 ## Installation
 
 ```bash
@@ -35,6 +42,8 @@ Config options include timeouts, retries, cache TTL, stale TTL, and raw payload 
 - `language` (`ro` or `en` for output field naming)
 - `use_locks` to toggle cache locks for single-flight protection
 - `batch_max_size` and `batch_chunk_size` for batching behavior
+- `logging` for PSR-3 request/response metadata logging
+- `circuit_breaker` for cooldown after repeated 5xx responses
 
 ## Usage
 
@@ -53,6 +62,8 @@ The lookup accepts `RO123`, ` ro 123 `, or `123` and normalizes to an integer CU
 Full documentation is available in the repo wiki pages under `docs/wiki`. Start with:
 
 - `docs/wiki/Home.md`
+
+JSON Schema definitions (versioned) are available under `docs/schemas`.
 
 ### Field naming & structure
 
@@ -188,6 +199,29 @@ You can also include raw data per command call with `--raw`.
 - Default cache TTL is 24 hours.
 - When a request fails and a stale cache entry exists (within the configured stale TTL), the stale entry is returned with `meta.is_stale = true`.
 - Retries use exponential backoff and only trigger on 429 and 5xx responses.
+- Circuit breaker (optional) opens after repeated 5xx responses and cools down for a configurable interval.
+
+## Response errors
+
+The package throws typed exceptions for error scenarios:
+
+- `InvalidCuiException` when the input cannot be normalized to a valid CUI.
+- `LookupFailedException` for upstream failures (timeouts, 429/5xx, invalid responses).
+- `CircuitOpenException` when the circuit breaker is open.
+
+Example (single lookup):
+
+```php
+try {
+    $company = RoCompanyLookup::lookup('RO123456');
+} catch (\Valsis\RoCompanyLookup\Exceptions\InvalidCuiException $e) {
+    // Handle invalid input
+} catch (\Valsis\RoCompanyLookup\Exceptions\CircuitOpenException $e) {
+    // Service temporarily unavailable
+} catch (\Valsis\RoCompanyLookup\Exceptions\LookupFailedException $e) {
+    // Upstream failure
+}
+```
 
 ## Artisan command
 

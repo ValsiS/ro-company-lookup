@@ -15,4 +15,9 @@ class CacheKey
     {
         return sprintf('%s:%s:%s:%s:lock', $prefix, $driver, $cui, $date);
     }
+
+    public static function forCircuit(string $prefix, string $driver): string
+    {
+        return sprintf('%s:%s:circuit', $prefix, $driver);
+    }
 }

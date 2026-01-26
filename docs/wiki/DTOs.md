@@ -46,6 +46,13 @@ The package returns `CompanySimpleData` (spatie/laravel-data). Output keys are m
 
 When `language` is set to `en`, the same structure is returned with translated keys.
 
+## JSON Schemas
+
+Versioned JSON Schemas are available in:
+
+- `docs/schemas/company-simple.ro.v1.json`
+- `docs/schemas/company-simple.en.v1.json`
+
 ```json
 {
   "address": {

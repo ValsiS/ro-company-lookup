@@ -33,3 +33,4 @@ $company = RoCompanyLookup::lookup('RO123456');
 - Caching and retries: `docs/wiki/Caching-Retries.md`
 - Artisan command: `docs/wiki/Commands.md`
 - Troubleshooting: `docs/wiki/Troubleshooting.md`
+- JSON Schemas: `docs/schemas`

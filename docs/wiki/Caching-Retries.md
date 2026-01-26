@@ -12,3 +12,9 @@
 - Retries are applied only for HTTP 429 and 5xx responses.
 - Backoff is exponential based on `anaf.backoff_ms`.
 - Other 4xx responses fail fast.
+
+## Circuit breaker
+
+- The circuit breaker opens after repeated 5xx responses.
+- When open, calls fail fast or return stale cache entries (if available).
+- Cooldown duration is controlled by `circuit_breaker.cooldown_seconds`.
