@@ -193,7 +193,15 @@ class AnafDriver implements RoCompanyLookupDriver
     protected function findEntryForCui(array $entries, int $cui): ?array
     {
         foreach ($entries as $entry) {
-            $entryCui = (int) ($entry['cui'] ?? $entry['cod'] ?? $entry['codFiscal'] ?? $entry['cod_fiscal'] ?? 0);
+            $general = is_array($entry['date_generale'] ?? null) ? $entry['date_generale'] : null;
+            $entryCui = (int) (
+                $entry['cui']
+                ?? $entry['cod']
+                ?? $entry['codFiscal']
+                ?? $entry['cod_fiscal']
+                ?? $general['cui']
+                ?? 0
+            );
             if ($entryCui === $cui) {
                 return $entry;
             }
