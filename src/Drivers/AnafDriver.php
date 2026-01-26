@@ -9,6 +9,7 @@ use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Spatie\LaravelData\DataCollection;
 use Valsis\RoCompanyLookup\Contracts\RoCompanyLookupDriver;
 use Valsis\RoCompanyLookup\Data\AddressData;
@@ -215,6 +216,8 @@ class AnafDriver implements RoCompanyLookupDriver
      */
     protected function mapEntry(array $entry, int $cui): CompanySimpleData
     {
+        $this->auditEntry($entry);
+
         $general = is_array($entry['date_generale'] ?? null) ? $entry['date_generale'] : null;
         $name = $this->firstValue($general ?? $entry, ['denumire', 'nume', 'name']);
         $nrRegCom = $this->firstValue($general ?? $entry, ['nrRegCom', 'nr_reg_com', 'nr_reg_comert']);
@@ -275,6 +278,308 @@ class AnafDriver implements RoCompanyLookupDriver
             vat: $vat,
             meta: MetaData::blank()
         );
+    }
+
+    /**
+     * @param  array<string, mixed>  $entry
+     */
+    protected function auditEntry(array $entry): void
+    {
+        if (! config('ro-company-lookup.schema_audit.enabled', false)) {
+            return;
+        }
+
+        $schema = $this->schemaDefinition();
+        $unknown = $this->collectUnknownKeys($entry, $schema);
+        if (count($unknown) === 0) {
+            return;
+        }
+
+        $channel = config('ro-company-lookup.schema_audit.channel');
+        $level = (string) config('ro-company-lookup.schema_audit.level', 'warning');
+        $logger = $channel ? Log::channel($channel) : Log::getFacadeRoot();
+
+        if ($logger !== null) {
+            $logger->log($level, 'ANAF payload contains unknown keys.', [
+                'unknown' => $unknown,
+            ]);
+        }
+
+        if (config('ro-company-lookup.schema_audit.fail_on_unknown', false)) {
+            throw new LookupFailedException('ANAF payload contains unknown keys.');
+        }
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    protected function schemaDefinition(): array
+    {
+        return $this->normalizeSchema([
+            'cui',
+            'cod',
+            'codFiscal',
+            'cod_fiscal',
+            'denumire',
+            'nume',
+            'name',
+            'nrRegCom',
+            'nr_reg_com',
+            'nr_reg_comert',
+            'caen',
+            'cod_CAEN',
+            'cod_caen',
+            'telefon',
+            'email',
+            'fax',
+            'adresa',
+            'domiciliu_fiscal' => [
+                'adresa',
+                'judet',
+                'localitate',
+                'sector',
+                'strada',
+                'numar',
+                'cod_postal',
+                'tara',
+                'tip_strada',
+                'bloc',
+                'scara',
+                'etaj',
+                'apartament',
+                'cod_siruta',
+            ],
+            'domiciliuFiscal' => [
+                'adresa',
+                'judet',
+                'localitate',
+                'sector',
+                'strada',
+                'numar',
+                'cod_postal',
+                'tara',
+                'tip_strada',
+                'bloc',
+                'scara',
+                'etaj',
+                'apartament',
+                'cod_siruta',
+            ],
+            'sediu_social' => [
+                'adresa',
+                'judet',
+                'localitate',
+                'sector',
+                'strada',
+                'numar',
+                'cod_postal',
+                'tara',
+                'tip_strada',
+                'bloc',
+                'scara',
+                'etaj',
+                'apartament',
+                'cod_siruta',
+            ],
+            'sediuSocial' => [
+                'adresa',
+                'judet',
+                'localitate',
+                'sector',
+                'strada',
+                'numar',
+                'cod_postal',
+                'tara',
+                'tip_strada',
+                'bloc',
+                'scara',
+                'etaj',
+                'apartament',
+                'cod_siruta',
+            ],
+            'tva' => [
+                'scpTVA',
+                'data_inceput',
+                'data_sfarsit',
+                'data_actualizare',
+                'history' => [
+                    'scpTVA',
+                    'data_inceput',
+                    'data_sfarsit',
+                ],
+                'istoric' => [
+                    'scpTVA',
+                    'data_inceput',
+                    'data_sfarsit',
+                ],
+            ],
+            'vat' => [
+                'scpTVA',
+                'data_inceput',
+                'data_sfarsit',
+                'data_actualizare',
+                'history' => [
+                    'scpTVA',
+                    'data_inceput',
+                    'data_sfarsit',
+                ],
+                'istoric' => [
+                    'scpTVA',
+                    'data_inceput',
+                    'data_sfarsit',
+                ],
+            ],
+            'scpTVA',
+            'forma_juridica',
+            'organizare',
+            'data_actualizare',
+            'legal_history',
+            'istoric_forme',
+            'date_generale' => [
+                'data',
+                'cui',
+                'denumire',
+                'adresa',
+                'telefon',
+                'fax',
+                'codPostal',
+                'act',
+                'stare_inregistrare',
+                'data_inreg_Reg_RO_e_Factura',
+                'organFiscalCompetent',
+                'forma_de_proprietate',
+                'forma_organizare',
+                'forma_juridica',
+                'statusRO_e_Factura',
+                'data_inregistrare',
+                'nrRegCom',
+                'cod_CAEN',
+                'iban',
+            ],
+            'inregistrare_scop_Tva' => [
+                'scpTVA',
+                'perioade_TVA' => [
+                    'data_inceput_ScpTVA',
+                    'data_sfarsit_ScpTVA',
+                    'data_anul_imp_ScpTVA',
+                    'mesaj_ScpTVA',
+                ],
+            ],
+            'inregistrare_RTVAI' => [
+                'dataActualizareTvaInc',
+                'dataPublicareTvaInc',
+                'dataInceputTvaInc',
+                'dataSfarsitTvaInc',
+                'tipActTvaInc',
+                'statusTvaIncasare',
+            ],
+            'stare_inactiv' => [
+                'dataInactivare',
+                'dataReactivare',
+                'dataPublicare',
+                'dataRadiere',
+                'statusInactivi',
+            ],
+            'inregistrare_SplitTVA' => [
+                'statusSplitTVA',
+                'dataInceputSplitTVA',
+                'dataAnulareSplitTVA',
+            ],
+            'adresa_sediu_social' => [
+                'stara',
+                'sdenumire_Localitate',
+                'sdenumire_Strada',
+                'snumar_Strada',
+                'scod_Localitate',
+                'sdenumire_Judet',
+                'scod_Judet',
+                'scod_JudetAuto',
+                'sdetalii_Adresa',
+                'scod_Postal',
+            ],
+            'adresa_domiciliu_fiscal' => [
+                'dtara',
+                'ddenumire_Localitate',
+                'ddenumire_Strada',
+                'dnumar_Strada',
+                'dcod_Localitate',
+                'ddenumire_Judet',
+                'dcod_Judet',
+                'dcod_JudetAuto',
+                'ddetalii_Adresa',
+                'dcod_Postal',
+            ],
+        ]);
+    }
+
+    /**
+     * @param  array<int|string, mixed>  $schema
+     * @return array<string, mixed>
+     */
+    protected function normalizeSchema(array $schema): array
+    {
+        $normalized = [];
+        foreach ($schema as $key => $value) {
+            if (is_int($key)) {
+                $normalized[(string) $value] = true;
+
+                continue;
+            }
+
+            if (is_array($value)) {
+                $normalized[$key] = $this->normalizeSchema($value);
+
+                continue;
+            }
+
+            $normalized[$key] = true;
+        }
+
+        return $normalized;
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @param  array<string, mixed>  $schema
+     * @param  array<int, array<string, mixed>>  $unknown
+     * @return array<int, array<string, mixed>>
+     */
+    protected function collectUnknownKeys(array $data, array $schema, string $path = '', array $unknown = []): array
+    {
+        foreach ($data as $key => $value) {
+            $key = (string) $key;
+            $nextPath = $path === '' ? $key : $path.'.'.$key;
+
+            if (! array_key_exists($key, $schema)) {
+                $unknown[] = [
+                    'path' => $nextPath,
+                    'type' => gettype($value),
+                ];
+
+                continue;
+            }
+
+            if (is_array($schema[$key]) && is_array($value)) {
+                if (array_is_list($value)) {
+                    foreach ($value as $index => $item) {
+                        if (! is_array($item)) {
+                            continue;
+                        }
+
+                        $unknown = $this->collectUnknownKeys(
+                            $item,
+                            $schema[$key],
+                            $nextPath.'['.$index.']',
+                            $unknown
+                        );
+                    }
+                } else {
+                    $unknown = $this->collectUnknownKeys($value, $schema[$key], $nextPath, $unknown);
+                }
+            }
+        }
+
+        return $unknown;
     }
 
     protected function mapVat(mixed $vatData, ?\DateTimeImmutable $queriedAt = null): VatStatusData

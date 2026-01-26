@@ -37,6 +37,13 @@ return [
         'level' => 'info',
     ],
 
+    'schema_audit' => [
+        'enabled' => false,
+        'fail_on_unknown' => false,
+        'channel' => null,
+        'level' => 'warning',
+    ],
+
     'circuit_breaker' => [
         'enabled' => true,
         'failure_threshold' => 3,
