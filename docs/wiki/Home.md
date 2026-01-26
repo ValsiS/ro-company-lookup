@@ -21,7 +21,7 @@ $company = RoCompanyLookup::lookup('RO123456');
 - Caching with stale fallback
 - Retries with exponential backoff
 - DTOs via spatie/laravel-data
-- Termene.ro-style output structure with optional EN key naming
+- ANAF-aligned output structure with optional EN key naming
 
 ## Documentation pages
 

@@ -56,7 +56,7 @@ Full documentation is available in the repo wiki pages under `docs/wiki`. Start 
 
 ### Field naming & structure
 
-Output follows the Termene.ro structure as closely as possible (e.g., `firma`, `adresa`, `cod_caen`, `date_contact`, `forma_juridica`, `statut_tva`). Use the `language` config to switch between `ro` and `en` output keys. Internally you can still access properties using the original PHP property names.
+Output follows the official ANAF field naming conventions (e.g., `firma`, `adresa`, `cod_caen`, `date_contact`, `forma_juridica`, `statut_tva`). Use the `language` config to switch between `ro` and `en` output keys. Internally you can still access properties using the original PHP property names.
 
 Example output (RO):
 
