@@ -33,6 +33,18 @@ All configuration lives in `config/ro-company-lookup.php`.
 - `batch_max_size`: max CUIs per ANAF request (hard limit 100)
 - `batch_chunk_size`: chunk size used by the package
 
+## Logging
+
+- `logging.enabled`: enable PSR-3 logging
+- `logging.channel`: optional log channel
+- `logging.level`: log level (default `info`)
+
+## Circuit breaker
+
+- `circuit_breaker.enabled`: enable/disable circuit breaker
+- `circuit_breaker.failure_threshold`: number of 5xx failures before opening
+- `circuit_breaker.cooldown_seconds`: cooldown duration before closing
+
 ## Raw payload
 
 - `enable_raw`: when true, include `meta.raw` in DTOs

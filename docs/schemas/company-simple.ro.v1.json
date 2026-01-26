@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/ValsiS/ro-company-lookup/main/docs/schemas/company-simple.ro.v1.json",
+  "title": "CompanySimpleData (ro)",
+  "type": "object",
+  "properties": {
+    "firma": {
+      "type": "object",
+      "properties": {
+        "cui": { "type": "integer" },
+        "j": { "type": ["string", "null"] },
+        "nume_mfinante": { "type": ["string", "null"] },
+        "nume_recom": { "type": ["string", "null"] }
+      },
+      "required": ["cui"],
+      "additionalProperties": true
+    },
+    "adresa": {
+      "type": "object",
+      "properties": {
+        "anaf": { "$ref": "#/definitions/adresa" },
+        "sediu_social": { "$ref": "#/definitions/adresa" }
+      },
+      "additionalProperties": true
+    },
+    "cod_caen": {
+      "type": "object",
+      "properties": {
+        "principal_mfinante": { "$ref": "#/definitions/caen" },
+        "principal_recom": { "$ref": "#/definitions/caen" }
+      },
+      "additionalProperties": true
+    },
+    "date_contact": {
+      "type": "object",
+      "properties": {
+        "telefon": { "type": "array", "items": { "type": "string" } },
+        "email": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": true
+    },
+    "forma_juridica": {
+      "type": "object",
+      "properties": {
+        "curenta": { "$ref": "#/definitions/forma_juridica" },
+        "istoric": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/forma_juridica" }
+        }
+      },
+      "additionalProperties": true
+    },
+    "statut_tva": {
+      "type": "object",
+      "properties": {
+        "curent": { "$ref": "#/definitions/statut_tva" },
+        "istoric": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/statut_tva" }
+        }
+      },
+      "additionalProperties": true
+    },
+    "meta": {
+      "type": "object",
+      "properties": {
+        "sursa": { "type": "string" },
+        "data_interogare": { "type": "string" },
+        "data_ceruta": { "type": "string" },
+        "este_stale": { "type": "boolean" },
+        "cache_hit": { "type": "boolean" },
+        "raw": { "type": ["object", "array", "null"] }
+      },
+      "required": ["sursa", "data_interogare", "data_ceruta", "este_stale", "cache_hit"],
+      "additionalProperties": true
+    }
+  },
+  "required": [
+    "firma",
+    "adresa",
+    "cod_caen",
+    "date_contact",
+    "forma_juridica",
+    "statut_tva",
+    "meta"
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "caen": {
+      "type": ["object", "null"],
+      "properties": {
+        "cod": { "type": ["string", "null"] },
+        "label": { "type": ["string", "null"] },
+        "versiune": { "type": ["integer", "null"] }
+      },
+      "additionalProperties": true
+    },
+    "adresa": {
+      "type": ["object", "null"],
+      "properties": {
+        "formatat": { "type": ["string", "null"] },
+        "neprelucrat": { "type": ["string", "null"] },
+        "neprelucrat_mf": { "type": ["string", "null"] },
+        "neprelucrat_recom": { "type": ["string", "null"] },
+        "tara": { "type": ["string", "null"] },
+        "judet": { "type": ["string", "null"] },
+        "localitate": { "type": ["string", "null"] },
+        "sub_localitate": { "type": ["string", "null"] },
+        "sector": { "type": ["string", "null"] },
+        "strada": { "type": ["string", "null"] },
+        "tip_strada": { "type": ["string", "null"] },
+        "numar": { "type": ["string", "null"] },
+        "bloc": { "type": ["string", "null"] },
+        "scara": { "type": ["string", "null"] },
+        "etaj": { "type": ["string", "null"] },
+        "apartament": { "type": ["string", "null"] },
+        "cod_postal": { "type": ["string", "null"] },
+        "cod_siruta": { "type": ["string", "null"] },
+        "sursa": { "type": ["string", "null"] },
+        "expirare": { "$ref": "#/definitions/expirare" }
+      },
+      "additionalProperties": true
+    },
+    "expirare": {
+      "type": ["object", "null"],
+      "properties": {
+        "data_actualizare": { "type": ["string", "null"] },
+        "data_expirare": { "type": ["string", "null"] },
+        "este_expirat": { "type": ["boolean", "null"] }
+      },
+      "additionalProperties": true
+    },
+    "forma_juridica": {
+      "type": ["object", "null"],
+      "properties": {
+        "data_actualizare": { "type": ["string", "null"] },
+        "denumire": { "type": ["string", "null"] },
+        "organizare": { "type": ["string", "null"] }
+      },
+      "additionalProperties": true
+    },
+    "statut_tva": {
+      "type": ["object", "null"],
+      "properties": {
+        "cod": { "type": ["integer", "null"] },
+        "label": { "type": ["string", "null"] },
+        "data_inceput_tva": { "type": ["string", "null"] },
+        "data_anulare_tva": { "type": ["string", "null"] },
+        "data_operare_anulare_tva": { "type": ["string", "null"] },
+        "data_interogare": { "type": ["string", "null"] }
+      },
+      "additionalProperties": true
+    }
+  }
+}

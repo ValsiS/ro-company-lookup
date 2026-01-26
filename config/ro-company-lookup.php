@@ -29,4 +29,16 @@ return [
     'batch_chunk_size' => 100,
 
     'enable_raw' => false,
+
+    'logging' => [
+        'enabled' => false,
+        'channel' => null,
+        'level' => 'info',
+    ],
+
+    'circuit_breaker' => [
+        'enabled' => true,
+        'failure_threshold' => 3,
+        'cooldown_seconds' => 60,
+    ],
 ];

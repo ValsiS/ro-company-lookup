@@ -6,12 +6,15 @@ namespace Valsis\RoCompanyLookup;
 
 use DateTimeInterface;
 use Illuminate\Contracts\Cache\LockTimeoutException;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Manager;
+use Psr\Log\LoggerInterface;
 use Spatie\LaravelData\Support\Transformation\TransformationContextFactory;
 use Valsis\RoCompanyLookup\Batch\BatchLookup;
 use Valsis\RoCompanyLookup\Contracts\RoCompanyLookupDriver;
 use Valsis\RoCompanyLookup\Data\CompanySimpleData;
 use Valsis\RoCompanyLookup\Drivers\AnafDriver;
+use Valsis\RoCompanyLookup\Exceptions\CircuitOpenException;
 use Valsis\RoCompanyLookup\Exceptions\LookupFailedException;
 use Valsis\RoCompanyLookup\Support\CacheKey;
 use Valsis\RoCompanyLookup\Support\DateHelper;
@@ -43,6 +46,7 @@ class RoCompanyLookupManager extends Manager
 
         $cacheKey = CacheKey::forLookup($cachePrefix, $driverName, $normalizedCui, $dateString);
         $lockKey = CacheKey::forLock($cachePrefix, $driverName, $normalizedCui, $dateString);
+        $circuitKey = CacheKey::forCircuit($cachePrefix, $driverName);
         $cacheTtl = (int) config('ro-company-lookup.cache_ttl_seconds', 86400);
         $staleTtl = (int) config('ro-company-lookup.stale_ttl_seconds', 0);
         $useLocks = (bool) config('ro-company-lookup.use_locks', true);
@@ -65,7 +69,8 @@ class RoCompanyLookupManager extends Manager
             $cacheTtl,
             $staleTtl,
             $includeRaw,
-            $cachedEntry
+            $cachedEntry,
+            $circuitKey
         ) {
             $cachedEntry = $cache->get($cacheKey);
             if (is_array($cachedEntry)) {
@@ -75,9 +80,43 @@ class RoCompanyLookupManager extends Manager
                 }
             }
 
+            if ($this->isCircuitOpen($cache, $circuitKey)) {
+                $this->log('warning', 'ro-company-lookup.circuit_open', [
+                    'driver' => $driverName,
+                    'cui' => $normalizedCui,
+                    'date' => $dateString,
+                ]);
+
+                if (is_array($cachedEntry)) {
+                    $cached = $this->hydrateCachedEntry($cachedEntry, $dateString, $includeRaw, true);
+                    if ($cached['is_stale']) {
+                        return $cached['data'];
+                    }
+                }
+
+                throw new CircuitOpenException('Service temporarily unavailable (circuit open).', 503);
+            }
+
+            $startedAt = microtime(true);
+            $this->log('info', 'ro-company-lookup.request', [
+                'driver' => $driverName,
+                'cui' => $normalizedCui,
+                'date' => $dateString,
+            ]);
+
             try {
                 $response = $this->driver($driverName)->lookup($normalizedCui, $date);
             } catch (LookupFailedException $exception) {
+                $this->recordCircuitFailure($cache, $circuitKey, $exception);
+                $this->log('error', 'ro-company-lookup.failure', [
+                    'driver' => $driverName,
+                    'cui' => $normalizedCui,
+                    'date' => $dateString,
+                    'code' => $exception->getCode(),
+                    'message' => $exception->getMessage(),
+                    'duration_ms' => $this->durationMs($startedAt),
+                ]);
+
                 if (is_array($cachedEntry)) {
                     $cached = $this->hydrateCachedEntry($cachedEntry, $dateString, $includeRaw, true);
                     if ($cached['is_stale']) {
@@ -87,6 +126,14 @@ class RoCompanyLookupManager extends Manager
 
                 throw $exception;
             }
+
+            $this->clearCircuit($cache, $circuitKey);
+            $this->log('info', 'ro-company-lookup.response', [
+                'driver' => $driverName,
+                'cui' => $normalizedCui,
+                'date' => $dateString,
+                'duration_ms' => $this->durationMs($startedAt),
+            ]);
 
             $data = $response->data;
             $fetchedAt = DateHelper::now();
@@ -159,6 +206,7 @@ class RoCompanyLookupManager extends Manager
         $cacheTtl = (int) config('ro-company-lookup.cache_ttl_seconds', 86400);
         $staleTtl = (int) config('ro-company-lookup.stale_ttl_seconds', 0);
         $includeRaw = (bool) config('ro-company-lookup.enable_raw', false);
+        $circuitKey = CacheKey::forCircuit($cachePrefix, $driverName);
 
         $results = [];
         $staleCandidates = [];
@@ -194,10 +242,47 @@ class RoCompanyLookupManager extends Manager
         $chunks = array_chunk($missing, $chunkSize);
 
         foreach ($chunks as $chunk) {
+            if ($this->isCircuitOpen($cache, $circuitKey)) {
+                $this->log('warning', 'ro-company-lookup.circuit_open', [
+                    'driver' => $driverName,
+                    'count' => count($chunk),
+                    'date' => $dateString,
+                ]);
+
+                foreach ($chunk as $cui) {
+                    if (isset($staleCandidates[$cui])) {
+                        $results[$cui] = $staleCandidates[$cui];
+
+                        continue;
+                    }
+
+                    throw new CircuitOpenException('Service temporarily unavailable (circuit open).', 503);
+                }
+
+                continue;
+            }
+
+            $startedAt = microtime(true);
+            $this->log('info', 'ro-company-lookup.request', [
+                'driver' => $driverName,
+                'count' => count($chunk),
+                'date' => $dateString,
+            ]);
+
             try {
                 /** @var \Valsis\RoCompanyLookup\Drivers\DriverResponse[] $responses */
                 $responses = $this->driver($driverName)->batch($chunk, $date);
             } catch (LookupFailedException $exception) {
+                $this->recordCircuitFailure($cache, $circuitKey, $exception);
+                $this->log('error', 'ro-company-lookup.failure', [
+                    'driver' => $driverName,
+                    'count' => count($chunk),
+                    'date' => $dateString,
+                    'code' => $exception->getCode(),
+                    'message' => $exception->getMessage(),
+                    'duration_ms' => $this->durationMs($startedAt),
+                ]);
+
                 foreach ($chunk as $cui) {
                     if (isset($staleCandidates[$cui])) {
                         $results[$cui] = $staleCandidates[$cui];
@@ -210,6 +295,14 @@ class RoCompanyLookupManager extends Manager
 
                 continue;
             }
+
+            $this->clearCircuit($cache, $circuitKey);
+            $this->log('info', 'ro-company-lookup.response', [
+                'driver' => $driverName,
+                'count' => count($chunk),
+                'date' => $dateString,
+                'duration_ms' => $this->durationMs($startedAt),
+            ]);
 
             foreach ($responses as $response) {
                 $data = $response->data;
@@ -316,5 +409,116 @@ class RoCompanyLookupManager extends Manager
             'is_fresh' => $isFresh,
             'is_stale' => $isStale,
         ];
+    }
+
+    protected function logger(): ?LoggerInterface
+    {
+        $config = config('ro-company-lookup.logging', []);
+        $enabled = (bool) ($config['enabled'] ?? false);
+        if (! $enabled) {
+            return null;
+        }
+
+        $channel = $config['channel'] ?? null;
+        if (is_string($channel) && $channel !== '') {
+            return Log::channel($channel);
+        }
+
+        return app(LoggerInterface::class);
+    }
+
+    /**
+     * @param  array<string, mixed>  $context
+     */
+    protected function log(string $level, string $message, array $context = []): void
+    {
+        $logger = $this->logger();
+        if (! $logger) {
+            return;
+        }
+
+        $config = config('ro-company-lookup.logging', []);
+        $configuredLevel = (string) ($config['level'] ?? $level);
+
+        $logger->log($configuredLevel, $message, $context);
+    }
+
+    protected function durationMs(float $startedAt): int
+    {
+        return (int) round((microtime(true) - $startedAt) * 1000);
+    }
+
+    protected function isCircuitOpen(\Illuminate\Contracts\Cache\Repository $cache, string $key): bool
+    {
+        $config = config('ro-company-lookup.circuit_breaker', []);
+        if (! ($config['enabled'] ?? true)) {
+            return false;
+        }
+
+        $threshold = (int) ($config['failure_threshold'] ?? 3);
+        $cooldown = (int) ($config['cooldown_seconds'] ?? 60);
+        if ($threshold <= 0 || $cooldown <= 0) {
+            return false;
+        }
+
+        $state = $cache->get($key);
+        if (! is_array($state)) {
+            return false;
+        }
+
+        $failures = (int) ($state['failures'] ?? 0);
+        $lastFailure = $state['last_failure_at'] ?? null;
+        if ($failures < $threshold || ! is_string($lastFailure) || $lastFailure === '') {
+            return false;
+        }
+
+        $lastFailureAt = DateHelper::parseCacheDateTime($lastFailure);
+        if (! $lastFailureAt) {
+            return false;
+        }
+
+        $elapsed = DateHelper::now()->getTimestamp() - $lastFailureAt->getTimestamp();
+        if ($elapsed <= $cooldown) {
+            return true;
+        }
+
+        $cache->forget($key);
+
+        return false;
+    }
+
+    protected function recordCircuitFailure(\Illuminate\Contracts\Cache\Repository $cache, string $key, LookupFailedException $exception): void
+    {
+        if ($exception instanceof CircuitOpenException) {
+            return;
+        }
+
+        $code = (int) $exception->getCode();
+        if ($code < 500 || $code >= 600) {
+            return;
+        }
+
+        $config = config('ro-company-lookup.circuit_breaker', []);
+        if (! ($config['enabled'] ?? true)) {
+            return;
+        }
+
+        $cooldown = (int) ($config['cooldown_seconds'] ?? 60);
+        if ($cooldown <= 0) {
+            return;
+        }
+
+        $state = $cache->get($key);
+        $failures = is_array($state) ? (int) ($state['failures'] ?? 0) : 0;
+
+        $cache->put($key, [
+            'failures' => $failures + 1,
+            'last_failure_at' => DateHelper::now()->format(DateHelper::CACHE_DATETIME_FORMAT),
+        ], $cooldown);
+    }
+
+    protected function clearCircuit(\Illuminate\Contracts\Cache\Repository $cache, string $key): void
+    {
+        $cache->forget($key);
     }
 }
