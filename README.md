@@ -106,6 +106,63 @@ Example output (RO):
 }
 ```
 
+Example output (EN):
+
+```json
+{
+  "company": {
+    "cui": 33034700,
+    "trade_register_number": "J2014000546297",
+    "ministry_of_finance_name": "TERMENE JUST SRL",
+    "recom_name": "TERMENE JUST SRL"
+  },
+  "address": {
+    "anaf": {
+      "formatted_address": "Strada Nicolae Titulescu, Nr. 32, Ploiești, Județ Prahova",
+      "county": "Prahova",
+      "city": "Ploiești"
+    },
+    "registered_office": {
+      "formatted_address": "Strada Nicolae Titulescu, Nr. 32, Ploiești, Județ Prahova",
+      "county": "Prahova",
+      "city": "Ploiești"
+    }
+  },
+  "caen_code": {
+    "primary_ministry_of_finance": { "code": "6311", "label": "Data processing..." },
+    "primary_recom": { "code": "6310", "label": "Data processing...", "version": 3 }
+  },
+  "contact_details": {
+    "phone_numbers": ["0344803100"],
+    "emails": []
+  },
+  "legal_form": {
+    "current": { "updated_at": "2018-10-12T00:00:00Z", "name": "Limited Liability Company", "organization": "SRL" },
+    "history": []
+  },
+  "vat_status": {
+    "current": { "code": 2, "label": "Plătitor TVA", "queried_at": "2026-01-26" },
+    "history": []
+  },
+  "meta": {
+    "source": "anaf",
+    "queried_at": "2026-01-26T10:00:00Z",
+    "queried_for_date": "2026-01-26",
+    "is_stale": false,
+    "cache_hit": true
+  }
+}
+```
+
+Example batch response (RO, array of items):
+
+```json
+[
+  { "firma": { "cui": 123456 }, "meta": { "sursa": "anaf" } },
+  { "firma": { "cui": 789012 }, "meta": { "sursa": "anaf" } }
+]
+```
+
 ### Batch lookup
 
 ```php
