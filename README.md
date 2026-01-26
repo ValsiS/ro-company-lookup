@@ -57,6 +57,16 @@ $companyWithDate = RoCompanyLookup::lookup('123456', new DateTimeImmutable('2024
 
 The lookup accepts `RO123`, ` ro 123 `, or `123` and normalizes to an integer CUI. By default, the query date is "today" in `Europe/Bucharest`.
 
+If you prefer a non-throwing API, use `tryLookup()`:
+
+```php
+$result = RoCompanyLookup::tryLookup('RO123456');
+
+if ($result->status === 'ok') {
+    $company = $result->data;
+}
+```
+
 ## Documentation
 
 Full documentation is available in the repo wiki pages under `docs/wiki`. Start with:
@@ -182,6 +192,12 @@ $companies = RoCompanyLookup::batch(['RO123', 'RO456'])->get();
 
 ANAF supports up to 100 CUIs per request. The package enforces this limit.
 
+Soft batch lookup (no exceptions):
+
+```php
+$results = RoCompanyLookup::batch(['RO123', 'BAD', 'RO456'])->tryGet();
+```
+
 ### Raw payload access
 
 To include raw ANAF payloads in the DTO meta object:
@@ -222,6 +238,8 @@ try {
     // Upstream failure
 }
 ```
+
+For user-facing flows, consider `tryLookup()` which returns a `LookupResultData` with `status` values of `ok`, `not_found`, `invalid`, or `error`.
 
 ## Artisan command
 

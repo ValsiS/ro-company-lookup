@@ -42,4 +42,12 @@ class BatchLookup
     {
         return $this->manager->batchNow($this->cuis, $this->date);
     }
+
+    /**
+     * @return array<int, \Valsis\RoCompanyLookup\Data\LookupResultData>
+     */
+    public function tryGet(): array
+    {
+        return $this->manager->tryBatchNow($this->cuis, $this->date);
+    }
 }

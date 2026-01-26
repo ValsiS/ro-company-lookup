@@ -13,8 +13,10 @@ use Spatie\LaravelData\Support\Transformation\TransformationContextFactory;
 use Valsis\RoCompanyLookup\Batch\BatchLookup;
 use Valsis\RoCompanyLookup\Contracts\RoCompanyLookupDriver;
 use Valsis\RoCompanyLookup\Data\CompanySimpleData;
+use Valsis\RoCompanyLookup\Data\LookupResultData;
 use Valsis\RoCompanyLookup\Drivers\AnafDriver;
 use Valsis\RoCompanyLookup\Exceptions\CircuitOpenException;
+use Valsis\RoCompanyLookup\Exceptions\InvalidCuiException;
 use Valsis\RoCompanyLookup\Exceptions\LookupFailedException;
 use Valsis\RoCompanyLookup\Support\CacheKey;
 use Valsis\RoCompanyLookup\Support\DateHelper;
@@ -180,12 +182,65 @@ class RoCompanyLookupManager extends Manager
         }
     }
 
+    public function tryLookup(int|string $cui, ?DateTimeInterface $date = null, bool $includeRaw = false): LookupResultData
+    {
+        try {
+            $data = $this->lookup($cui, $date, $includeRaw);
+        } catch (InvalidCuiException $exception) {
+            return LookupResultData::invalid($exception->getMessage());
+        } catch (CircuitOpenException $exception) {
+            return LookupResultData::error($exception->getMessage(), 'circuit_open', $exception->getCode());
+        } catch (LookupFailedException $exception) {
+            return LookupResultData::error($exception->getMessage(), 'lookup_failed', $exception->getCode());
+        }
+
+        return $this->resultFromData($data);
+    }
+
     /**
      * @param  array<int, int|string>  $cuis
      */
     public function batch(array $cuis, ?DateTimeInterface $date = null): BatchLookup
     {
         return new BatchLookup($this, $cuis, $date);
+    }
+
+    /**
+     * @param  array<int, int|string>  $cuis
+     * @return array<int, LookupResultData>
+     */
+    public function tryBatchNow(array $cuis, ?DateTimeInterface $date = null): array
+    {
+        $valid = [];
+        $indexMap = [];
+        $results = [];
+
+        foreach ($cuis as $index => $cui) {
+            try {
+                $normalized = NormalizeCui::normalize($cui);
+                $valid[] = $normalized;
+                $indexMap[] = $index;
+            } catch (InvalidCuiException $exception) {
+                $results[$index] = LookupResultData::invalid($exception->getMessage());
+            }
+        }
+
+        if ($valid !== []) {
+            $dataItems = $this->batchNow($valid, $date);
+
+            foreach ($dataItems as $position => $data) {
+                $index = $indexMap[$position] ?? null;
+                if ($index === null) {
+                    continue;
+                }
+
+                $results[$index] = $this->resultFromData($data);
+            }
+        }
+
+        ksort($results);
+
+        return array_values($results);
     }
 
     /**
@@ -349,6 +404,26 @@ class RoCompanyLookupManager extends Manager
         }
 
         return $ordered;
+    }
+
+    protected function resultFromData(CompanySimpleData $data): LookupResultData
+    {
+        if ($this->isNotFound($data)) {
+            return LookupResultData::notFound($data);
+        }
+
+        return LookupResultData::ok($data);
+    }
+
+    protected function isNotFound(CompanySimpleData $data): bool
+    {
+        return $data->company->name_mfinante === null
+            && $data->company->registration_number === null
+            && $data->caen->principal_mfinante === null
+            && $data->address->anaf === null
+            && $data->address->registered_office === null
+            && $data->vat->current === null
+            && $data->legal->current === null;
     }
 
     /**

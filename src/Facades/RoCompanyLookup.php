@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Facade;
 
 /**
  * @method static \Valsis\RoCompanyLookup\Data\CompanySimpleData lookup(int|string $cui, ?\DateTimeInterface $date = null, bool $includeRaw = false)
+ * @method static \Valsis\RoCompanyLookup\Data\LookupResultData tryLookup(int|string $cui, ?\DateTimeInterface $date = null, bool $includeRaw = false)
  * @method static \Valsis\RoCompanyLookup\Batch\BatchLookup batch(array<int, int|string> $cuis, ?\DateTimeInterface $date = null)
  * @method static \Valsis\RoCompanyLookup\RoCompanyLookupManager driver(string|null $name = null)
  */
