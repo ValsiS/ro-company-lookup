@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.1.7] - 2026-01-27
+
+- Improved VAT period mapping and current status selection from ANAF payloads.
+- Added fax number to contact phones when provided.
+
 ## [0.1.6] - 2026-01-27
 
 - Improved VAT mapping to select the correct current period and include query timestamps.

@@ -236,6 +236,7 @@ class AnafDriver implements RoCompanyLookupDriver
         $contact = new ContactData(
             phones: array_filter([
                 $this->firstValue($general ?? $entry, ['telefon', 'phone', 'tel']),
+                $this->firstValue($general ?? $entry, ['fax']),
             ], static fn ($value) => $value !== null && $value !== ''),
             emails: array_filter([
                 $this->firstValue($general ?? $entry, ['email', 'emailAddress']),
@@ -281,7 +282,10 @@ class AnafDriver implements RoCompanyLookupDriver
         $current = null;
         $historyEntries = [];
 
+        $isVatPayer = null;
+
         if (is_array($vatData)) {
+            $hasPeriods = isset($vatData['perioade_TVA']) && is_array($vatData['perioade_TVA']);
             if (isset($vatData['perioade_TVA']) && is_array($vatData['perioade_TVA'])) {
                 $periods = $vatData['perioade_TVA'];
                 foreach ($periods as $period) {
@@ -291,7 +295,7 @@ class AnafDriver implements RoCompanyLookupDriver
 
                     $entryStart = DateHelper::parseDate($this->firstValue($period, ['data_inceput_ScpTVA']));
                     $entryEnd = DateHelper::parseDate($this->firstValue($period, ['data_sfarsit_ScpTVA']));
-                    $entryVat = $this->normalizeBool($this->firstValue($vatData, ['scpTVA']));
+                    $entryVat = true;
 
                     $entryData = $this->vatEntryFromStatus($entryVat, $entryStart, $entryEnd, $queriedAt);
                     if ($entryData !== null) {
@@ -301,8 +305,12 @@ class AnafDriver implements RoCompanyLookupDriver
             }
 
             $isVatPayer = $this->normalizeBool($this->firstValue($vatData, ['scpTVA', 'is_vat_payer', 'tva']));
-            $startDate = DateHelper::parseDate($this->firstValue($vatData, ['data_inceput', 'start_date', 'data_inceput_tva']));
-            $endDate = DateHelper::parseDate($this->firstValue($vatData, ['data_sfarsit', 'end_date', 'data_anulare_tva']));
+            $startDate = $hasPeriods
+                ? null
+                : DateHelper::parseDate($this->firstValue($vatData, ['data_inceput', 'start_date', 'data_inceput_tva']));
+            $endDate = $hasPeriods
+                ? null
+                : DateHelper::parseDate($this->firstValue($vatData, ['data_sfarsit', 'end_date', 'data_anulare_tva']));
 
             $current = $this->vatEntryFromStatus($isVatPayer, $startDate, $endDate, $queriedAt);
 
@@ -325,7 +333,7 @@ class AnafDriver implements RoCompanyLookupDriver
             }
         }
 
-        if (count($historyEntries) > 0) {
+        if (count($historyEntries) > 0 && $isVatPayer !== false) {
             $current = $this->selectCurrentVatEntry($historyEntries) ?? $current;
         }
 
