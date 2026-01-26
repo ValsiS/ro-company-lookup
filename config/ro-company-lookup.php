@@ -9,7 +9,7 @@ return [
 
     'anaf' => [
         'base_url' => 'https://webservicesp.anaf.ro',
-        'endpoint' => '/PlatitorTvaRest/api/v8/ws/tva',
+        'endpoint' => '/api/PlatitorTvaRest/v9/tva',
         'timeout' => 10,
         'connect_timeout' => 5,
         'retries' => 3,
