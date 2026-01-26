@@ -246,7 +246,8 @@ class AnafDriver implements RoCompanyLookupDriver
             ?? Arr::get($entry, 'scpTVA')
             ?? Arr::get($entry, 'vat')
             ?? Arr::get($entry, 'inregistrare_scop_Tva');
-        $vat = $this->mapVat($vatData);
+        $queriedAt = DateHelper::parseDate($this->firstValue($general ?? $entry, ['data', 'data_interogare']));
+        $vat = $this->mapVat($vatData, $queriedAt);
 
         $domiciliuRaw = Arr::get($entry, 'domiciliu_fiscal')
             ?? Arr::get($entry, 'domiciliuFiscal')
@@ -275,7 +276,7 @@ class AnafDriver implements RoCompanyLookupDriver
         );
     }
 
-    protected function mapVat(mixed $vatData): VatStatusData
+    protected function mapVat(mixed $vatData, ?\DateTimeImmutable $queriedAt = null): VatStatusData
     {
         $current = null;
         $historyEntries = [];
@@ -292,10 +293,9 @@ class AnafDriver implements RoCompanyLookupDriver
                     $entryEnd = DateHelper::parseDate($this->firstValue($period, ['data_sfarsit_ScpTVA']));
                     $entryVat = $this->normalizeBool($this->firstValue($vatData, ['scpTVA']));
 
-                    $entryData = $this->vatEntryFromStatus($entryVat, $entryStart, $entryEnd);
+                    $entryData = $this->vatEntryFromStatus($entryVat, $entryStart, $entryEnd, $queriedAt);
                     if ($entryData !== null) {
                         $historyEntries[] = $entryData;
-                        $current ??= $entryData;
                     }
                 }
             }
@@ -304,7 +304,7 @@ class AnafDriver implements RoCompanyLookupDriver
             $startDate = DateHelper::parseDate($this->firstValue($vatData, ['data_inceput', 'start_date', 'data_inceput_tva']));
             $endDate = DateHelper::parseDate($this->firstValue($vatData, ['data_sfarsit', 'end_date', 'data_anulare_tva']));
 
-            $current = $this->vatEntryFromStatus($isVatPayer, $startDate, $endDate);
+            $current = $this->vatEntryFromStatus($isVatPayer, $startDate, $endDate, $queriedAt);
 
             $history = $vatData['history'] ?? $vatData['istoric'] ?? [];
             if (is_array($history)) {
@@ -317,12 +317,16 @@ class AnafDriver implements RoCompanyLookupDriver
                     $entryStart = DateHelper::parseDate($this->firstValue($entry, ['data_inceput', 'start_date', 'data_inceput_tva']));
                     $entryEnd = DateHelper::parseDate($this->firstValue($entry, ['data_sfarsit', 'end_date', 'data_anulare_tva']));
 
-                    $entryData = $this->vatEntryFromStatus($entryVat, $entryStart, $entryEnd);
+                    $entryData = $this->vatEntryFromStatus($entryVat, $entryStart, $entryEnd, $queriedAt);
                     if ($entryData !== null) {
                         $historyEntries[] = $entryData;
                     }
                 }
             }
+        }
+
+        if (count($historyEntries) > 0) {
+            $current = $this->selectCurrentVatEntry($historyEntries) ?? $current;
         }
 
         return new VatStatusData(
@@ -331,7 +335,48 @@ class AnafDriver implements RoCompanyLookupDriver
         );
     }
 
-    protected function vatEntryFromStatus(?bool $isVatPayer, ?\DateTimeImmutable $startDate, ?\DateTimeImmutable $endDate): ?VatStatusEntryData
+    /**
+     * @param  list<VatStatusEntryData>  $entries
+     */
+    protected function selectCurrentVatEntry(array $entries): ?VatStatusEntryData
+    {
+        $openEnded = array_values(array_filter($entries, static fn (VatStatusEntryData $entry) => $entry->vat_cancel_date === null));
+        if (count($openEnded) > 0) {
+            return $this->selectLatestVatEntry($openEnded);
+        }
+
+        return $this->selectLatestVatEntry($entries);
+    }
+
+    /**
+     * @param  list<VatStatusEntryData>  $entries
+     */
+    protected function selectLatestVatEntry(array $entries): ?VatStatusEntryData
+    {
+        $latest = null;
+        foreach ($entries as $entry) {
+            if ($latest === null) {
+                $latest = $entry;
+                continue;
+            }
+
+            $latestStart = $latest->vat_start_date;
+            $entryStart = $entry->vat_start_date;
+
+            if ($latestStart === null) {
+                $latest = $entry;
+                continue;
+            }
+
+            if ($entryStart !== null && $entryStart > $latestStart) {
+                $latest = $entry;
+            }
+        }
+
+        return $latest;
+    }
+
+    protected function vatEntryFromStatus(?bool $isVatPayer, ?\DateTimeImmutable $startDate, ?\DateTimeImmutable $endDate, ?\DateTimeImmutable $queriedAt): ?VatStatusEntryData
     {
         if ($isVatPayer === null && $startDate === null && $endDate === null) {
             return null;
@@ -351,7 +396,7 @@ class AnafDriver implements RoCompanyLookupDriver
             vat_start_date: $startDate,
             vat_cancel_date: $endDate,
             vat_cancel_operation_date: null,
-            queried_at: null
+            queried_at: $queriedAt
         );
     }
 
