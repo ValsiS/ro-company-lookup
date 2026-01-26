@@ -207,9 +207,10 @@ class AnafDriver implements RoCompanyLookupDriver
      */
     protected function mapEntry(array $entry, int $cui): CompanySimpleData
     {
-        $name = $this->firstValue($entry, ['denumire', 'nume', 'name']);
-        $nrRegCom = $this->firstValue($entry, ['nrRegCom', 'nr_reg_com', 'nr_reg_comert']);
-        $caen = $this->firstValue($entry, ['caen', 'cod_caen']);
+        $general = is_array($entry['date_generale'] ?? null) ? $entry['date_generale'] : null;
+        $name = $this->firstValue($general ?? $entry, ['denumire', 'nume', 'name']);
+        $nrRegCom = $this->firstValue($general ?? $entry, ['nrRegCom', 'nr_reg_com', 'nr_reg_comert']);
+        $caen = $this->firstValue($general ?? $entry, ['cod_CAEN', 'cod_caen', 'caen']);
 
         $company = new FirmaData(
             cui: $cui,
@@ -226,25 +227,34 @@ class AnafDriver implements RoCompanyLookupDriver
 
         $contact = new ContactData(
             phones: array_filter([
-                $this->firstValue($entry, ['telefon', 'phone', 'tel']),
+                $this->firstValue($general ?? $entry, ['telefon', 'phone', 'tel']),
             ], static fn ($value) => $value !== null && $value !== ''),
             emails: array_filter([
-                $this->firstValue($entry, ['email', 'emailAddress']),
+                $this->firstValue($general ?? $entry, ['email', 'emailAddress']),
             ], static fn ($value) => $value !== null && $value !== '')
         );
 
-        $vatData = Arr::get($entry, 'tva') ?? Arr::get($entry, 'scpTVA') ?? Arr::get($entry, 'vat');
+        $vatData = Arr::get($entry, 'tva')
+            ?? Arr::get($entry, 'scpTVA')
+            ?? Arr::get($entry, 'vat')
+            ?? Arr::get($entry, 'inregistrare_scop_Tva');
         $vat = $this->mapVat($vatData);
 
-        $domiciliuRaw = Arr::get($entry, 'domiciliu_fiscal') ?? Arr::get($entry, 'domiciliuFiscal') ?? Arr::get($entry, 'adresa');
-        $sediuRaw = Arr::get($entry, 'sediu_social') ?? Arr::get($entry, 'sediuSocial');
+        $domiciliuRaw = Arr::get($entry, 'domiciliu_fiscal')
+            ?? Arr::get($entry, 'domiciliuFiscal')
+            ?? Arr::get($entry, 'adresa_domiciliu_fiscal')
+            ?? Arr::get($general ?? [], 'adresa')
+            ?? Arr::get($entry, 'adresa');
+        $sediuRaw = Arr::get($entry, 'sediu_social')
+            ?? Arr::get($entry, 'sediuSocial')
+            ?? Arr::get($entry, 'adresa_sediu_social');
 
         $addresses = new AddressSetData(
             anaf: $this->mapAddress($domiciliuRaw),
             registered_office: $this->mapAddress($sediuRaw)
         );
 
-        $legal = $this->mapLegal($entry);
+        $legal = $this->mapLegal($general ? array_merge($entry, $general) : $entry);
 
         return new CompanySimpleData(
             address: $addresses,
@@ -263,6 +273,25 @@ class AnafDriver implements RoCompanyLookupDriver
         $historyEntries = [];
 
         if (is_array($vatData)) {
+            if (isset($vatData['perioade_TVA']) && is_array($vatData['perioade_TVA'])) {
+                $periods = $vatData['perioade_TVA'];
+                foreach ($periods as $period) {
+                    if (! is_array($period)) {
+                        continue;
+                    }
+
+                    $entryStart = DateHelper::parseDate($this->firstValue($period, ['data_inceput_ScpTVA']));
+                    $entryEnd = DateHelper::parseDate($this->firstValue($period, ['data_sfarsit_ScpTVA']));
+                    $entryVat = $this->normalizeBool($this->firstValue($vatData, ['scpTVA']));
+
+                    $entryData = $this->vatEntryFromStatus($entryVat, $entryStart, $entryEnd);
+                    if ($entryData !== null) {
+                        $historyEntries[] = $entryData;
+                        $current ??= $entryData;
+                    }
+                }
+            }
+
             $isVatPayer = $this->normalizeBool($this->firstValue($vatData, ['scpTVA', 'is_vat_payer', 'tva']));
             $startDate = DateHelper::parseDate($this->firstValue($vatData, ['data_inceput', 'start_date', 'data_inceput_tva']));
             $endDate = DateHelper::parseDate($this->firstValue($vatData, ['data_sfarsit', 'end_date', 'data_anulare_tva']));
@@ -395,25 +424,28 @@ class AnafDriver implements RoCompanyLookupDriver
         $rawRecom = $this->firstValue($address, ['neprelucrat_recom']);
         $expiration = $this->mapExpiration($address['expirare'] ?? null);
 
+        $isD = array_key_exists('ddenumire_Judet', $address);
+        $isS = array_key_exists('sdenumire_Judet', $address);
+
         return new AddressData(
             formatted: $formatted,
             raw: $raw,
             raw_mf: $rawMf,
             raw_recom: $rawRecom,
-            country: $this->firstValue($address, ['tara', 'country']),
-            county: $this->firstValue($address, ['judet', 'county']),
-            city: $this->firstValue($address, ['localitate', 'oras', 'city']),
+            country: $this->firstValue($address, ['tara', 'country', 'dtara', 'stara']),
+            county: $this->firstValue($address, ['judet', 'county', 'ddenumire_Judet', 'sdenumire_Judet']),
+            city: $this->firstValue($address, ['localitate', 'oras', 'city', 'ddenumire_Localitate', 'sdenumire_Localitate']),
             sub_locality: $this->firstValue($address, ['sub_localitate']),
             sector: $this->firstValue($address, ['sector']),
-            street: $this->firstValue($address, ['strada', 'street']),
+            street: $this->firstValue($address, ['strada', 'street', 'ddenumire_Strada', 'sdenumire_Strada']),
             street_type: $this->firstValue($address, ['tip_strada']),
-            number: $this->firstValue($address, ['numar', 'number']),
+            number: $this->firstValue($address, ['numar', 'number', 'dnumar_Strada', 'snumar_Strada']),
             building: $this->firstValue($address, ['bloc', 'building']),
             entrance: $this->firstValue($address, ['scara', 'entrance']),
             floor: $this->firstValue($address, ['etaj', 'floor']),
             apartment: $this->firstValue($address, ['apartament', 'apartment']),
-            postal_code: $this->firstValue($address, ['cod_postal', 'postal_code']),
-            siruta_code: $this->firstValue($address, ['cod_siruta']),
+            postal_code: $this->firstValue($address, ['cod_postal', 'postal_code', 'dcod_Postal', 'scod_Postal']),
+            siruta_code: $this->firstValue($address, ['cod_siruta', 'dcod_Localitate', 'scod_Localitate']),
             source: $this->firstValue($address, ['sursa']),
             expiration: $expiration
         );
