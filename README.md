@@ -1,6 +1,6 @@
 # Ro Company Lookup
 
-[![Tests](https://github.com/ValsiS/ro-company-lookup/actions/workflows/run-tests.yml/badge.svg)](https://github.com/ValsiS/ro-company-lookup/actions/workflows/run-tests.yml)
+[![Tests](https://img.shields.io/github/actions/workflow/status/ValsiS/ro-company-lookup/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/ValsiS/ro-company-lookup/actions/workflows/run-tests.yml)
 [![Validate](https://img.shields.io/github/actions/workflow/status/ValsiS/ro-company-lookup/run-tests.yml?branch=main&label=validate&style=flat-square)](https://github.com/ValsiS/ro-company-lookup/actions/workflows/run-tests.yml)
 [![Latest Version](https://img.shields.io/github/v/release/ValsiS/ro-company-lookup.svg?style=flat-square)](https://github.com/ValsiS/ro-company-lookup/releases)
 [![PHP Version](https://img.shields.io/badge/php-8.3%2B-8892BF.svg?style=flat-square)](https://www.php.net/)
