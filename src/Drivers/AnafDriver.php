@@ -47,10 +47,11 @@ class AnafDriver implements RoCompanyLookupDriver
             throw new LookupFailedException(sprintf('ANAF batch limit exceeded. Maximum is %d CUIs.', $maxBatchSize));
         }
 
-        $payload = array_map(fn (int $cui) => [
+        /** @var list<array{cui: int, data: string}> $payload */
+        $payload = array_values(array_map(fn (int $cui) => [
             'cui' => $cui,
             'data' => DateHelper::formatDate($date),
-        ], $cuis);
+        ], $cuis));
 
         $response = $this->postWithRetries($payload);
 
@@ -127,7 +128,9 @@ class AnafDriver implements RoCompanyLookupDriver
             $attempt++;
 
             try {
-                $response = $this->request()->post($this->endpoint(), $payload);
+                /** @var array<int<0, max>|string, mixed> $payloadForRequest */
+                $payloadForRequest = $payload;
+                $response = $this->request()->post($this->endpoint(), $payloadForRequest);
             } catch (ConnectionException $exception) {
                 if ($attempt > $retries) {
                     throw new LookupFailedException('ANAF connection failed after retries.', previous: $exception);

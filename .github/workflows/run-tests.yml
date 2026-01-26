@@ -21,7 +21,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: composer:v2
-          coverage: none
+          coverage: pcov
 
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist
@@ -31,8 +31,13 @@ jobs:
       - name: Check formatting
         run: vendor/bin/pint --test
 
-      - name: Run tests
-        run: vendor/bin/phpunit
+      - name: Run tests with coverage
+        run: |
+          mkdir -p build/logs
+          vendor/bin/phpunit --coverage-clover build/logs/clover.xml
+
+      - name: Enforce coverage threshold
+        run: php scripts/coverage-threshold.php build/logs/clover.xml 50
 
       - name: Run static analysis
-        run: vendor/bin/phpstan analyse
+        run: composer analyse

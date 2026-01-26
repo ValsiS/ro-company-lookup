@@ -223,7 +223,7 @@ class RoCompanyLookupManager extends Manager
                 $this->applyVatQueryDate($data->vat, $fetchedAt);
 
                 if ($includeRaw) {
-                    $data->meta->raw = $response->raw;
+                    $data->meta->raw = $response->raw ?? [];
                 }
 
                 $cacheKey = CacheKey::forLookup($cachePrefix, $driverName, $data->company->cui, $dateString);

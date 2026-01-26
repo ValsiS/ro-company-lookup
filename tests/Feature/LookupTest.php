@@ -80,8 +80,8 @@ class LookupTest extends TestCase
     #[Test]
     public function it_returns_stale_cache_when_remote_fails(): void
     {
-        $this->app['config']->set('ro-company-lookup.cache_ttl_seconds', 60);
-        $this->app['config']->set('ro-company-lookup.stale_ttl_seconds', 3600);
+        config()->set('ro-company-lookup.cache_ttl_seconds', 60);
+        config()->set('ro-company-lookup.stale_ttl_seconds', 3600);
 
         Carbon::setTestNow(Carbon::parse('2024-01-01 10:00:00', 'Europe/Bucharest'));
         Http::fake([
@@ -118,8 +118,8 @@ class LookupTest extends TestCase
     #[Test]
     public function it_retries_on_server_error(): void
     {
-        $this->app['config']->set('ro-company-lookup.anaf.retries', 1);
-        $this->app['config']->set('ro-company-lookup.anaf.backoff_ms', 0);
+        config()->set('ro-company-lookup.anaf.retries', 1);
+        config()->set('ro-company-lookup.anaf.backoff_ms', 0);
 
         Http::fakeSequence('webservicesp.anaf.ro/*')
             ->push(['error' => 'down'], 500)

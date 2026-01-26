@@ -3,5 +3,6 @@
 /.phpunit.result.cache
 /.idea/
 /.vscode/
+/build/
 /node_modules/
 .DS_Store

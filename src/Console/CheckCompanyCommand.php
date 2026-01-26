@@ -18,12 +18,19 @@ class CheckCompanyCommand extends Command
 
     public function handle(RoCompanyLookupManager $manager): int
     {
-        $cui = $this->argument('cui');
+        $cuiArgument = $this->argument('cui');
+        if (! is_string($cuiArgument) || $cuiArgument === '') {
+            $this->error('Invalid CUI argument.');
+
+            return self::FAILURE;
+        }
+
+        $cui = $cuiArgument;
         $dateOption = $this->option('date');
         $includeRaw = (bool) $this->option('raw');
 
         $date = null;
-        if ($dateOption) {
+        if (is_string($dateOption) && $dateOption !== '') {
             try {
                 $date = new DateTimeImmutable($dateOption, new DateTimeZone('Europe/Bucharest'));
             } catch (\Throwable $exception) {
