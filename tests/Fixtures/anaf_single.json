@@ -1,0 +1,52 @@
+{
+  "found": [
+    {
+      "cui": 123456,
+      "denumire": "ACME SRL",
+      "nrRegCom": "J40/123/2010",
+      "caen": "6201",
+      "telefon": "0211234567",
+      "email": "office@acme.test",
+      "domiciliu_fiscal": {
+        "adresa": "Str. Exemplu 1, Bucuresti",
+        "judet": "Bucuresti",
+        "localitate": "Bucuresti",
+        "sector": "1",
+        "strada": "Str. Exemplu",
+        "numar": "1",
+        "cod_postal": "010101"
+      },
+      "sediu_social": {
+        "adresa": "Str. Secundara 2, Bucuresti",
+        "judet": "Bucuresti",
+        "localitate": "Bucuresti",
+        "sector": "2",
+        "strada": "Str. Secundara",
+        "numar": "2",
+        "cod_postal": "020202"
+      },
+      "tva": {
+        "scpTVA": true,
+        "data_inceput": "2020-01-01",
+        "data_sfarsit": null,
+        "data_actualizare": "2024-01-10",
+        "history": [
+          {
+            "data_inceput": "2018-01-01",
+            "data_sfarsit": "2019-12-31",
+            "scpTVA": false
+          },
+          {
+            "data_inceput": "2020-01-01",
+            "data_sfarsit": null,
+            "scpTVA": true
+          }
+        ]
+      },
+      "forma_juridica": "SRL",
+      "organizare": "PERSOANA JURIDICA",
+      "data_actualizare": "2024-01-10"
+    }
+  ],
+  "notfound": []
+}
