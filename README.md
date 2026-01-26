@@ -1,10 +1,10 @@
 # Ro Company Lookup
 
-[![Tests](https://img.shields.io/github/actions/workflow/status/ValsiS/ro-company-lookup/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/ValsiS/ro-company-lookup/actions/workflows/run-tests.yml)
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/valsis/ro-company-lookup.svg?style=flat-square)](https://packagist.org/packages/valsis/ro-company-lookup)
-[![PHP Version](https://img.shields.io/packagist/php-v/valsis/ro-company-lookup.svg?style=flat-square)](https://packagist.org/packages/valsis/ro-company-lookup)
-[![Total Downloads](https://img.shields.io/packagist/dt/valsis/ro-company-lookup.svg?style=flat-square)](https://packagist.org/packages/valsis/ro-company-lookup)
-[![License](https://img.shields.io/packagist/l/valsis/ro-company-lookup.svg?style=flat-square)](LICENSE)
+[![Tests](https://github.com/ValsiS/ro-company-lookup/actions/workflows/run-tests.yml/badge.svg)](https://github.com/ValsiS/ro-company-lookup/actions/workflows/run-tests.yml)
+[![Latest Version](https://img.shields.io/github/v/release/ValsiS/ro-company-lookup.svg?style=flat-square)](https://github.com/ValsiS/ro-company-lookup/releases)
+[![PHP Version](https://img.shields.io/badge/php-8.3%2B-8892BF.svg?style=flat-square)](https://www.php.net/)
+[![Total Downloads](https://img.shields.io/github/downloads/ValsiS/ro-company-lookup/total.svg?style=flat-square)](https://github.com/ValsiS/ro-company-lookup/releases)
+[![License](https://img.shields.io/github/license/ValsiS/ro-company-lookup.svg?style=flat-square)](LICENSE)
 
 A production-ready Laravel package that retrieves basic Romanian company data by CUI from ANAF public web services.
 Current version: `v0.1.1`.
