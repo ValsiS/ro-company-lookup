@@ -470,6 +470,10 @@ class AnafDriver implements RoCompanyLookupDriver
                 continue;
             }
 
+            if (is_bool($value)) {
+                return $value ? '1' : '0';
+            }
+
             return is_scalar($value) ? (string) $value : null;
         }
 

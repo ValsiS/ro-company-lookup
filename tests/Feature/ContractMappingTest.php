@@ -28,7 +28,7 @@ class ContractMappingTest extends TestCase
         $this->assertSame('6202', $result->caen->principal_mfinante?->code);
         $this->assertSame('Cluj', $result->address->anaf?->county);
         $this->assertNotNull($result->vat->current);
-        $this->assertSame(1, $result->vat->current?->code);
+        $this->assertSame(1, $result->vat->current->code);
     }
 
     #[Test]

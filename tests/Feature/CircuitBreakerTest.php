@@ -37,7 +37,8 @@ class CircuitBreakerTest extends TestCase
         Carbon::setTestNow(Carbon::parse('2024-01-01 10:02:00', 'Europe/Bucharest'));
 
         $manager = app(RoCompanyLookupManager::class);
-        $driver = new class implements RoCompanyLookupDriver {
+        $driver = new class implements RoCompanyLookupDriver
+        {
             public int $calls = 0;
 
             public function lookup(int $cui, DateTimeInterface $date): DriverResponse
