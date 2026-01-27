@@ -30,7 +30,7 @@ composer require valsis/ro-company-lookup
 ```php
 use Valsis\RoCompanyLookup\Facades\RoCompanyLookup;
 
-return RoCompanyLookup::summaryOrResult('RO46632129');
+return RoCompanyLookup::summaryOrResult('RO12345678');
 ```
 
 Example response:
@@ -38,11 +38,11 @@ Example response:
 ```json
 {
   "exists": true,
-  "cui": 46632129,
-  "name": "TERRADOT S.R.L.",
-  "caen": "6310",
-  "registration_date": "2022-08-11",
-  "vat_payer": true,
+  "cui": 12345678,
+  "name": "EXEMPLU SRL",
+  "caen": "6201",
+  "registration_date": "01.01.2020",
+  "vat_payer": false,
   "status": "ok",
   "message": null,
   "error": null,
@@ -201,11 +201,11 @@ Company profile (`company.profile`) includes:
 ```json
 {
   "exists": true,
-  "cui": 46632129,
-  "name": "TERRADOT S.R.L.",
-  "caen": "6310",
-  "registration_date": "2022-08-11",
-  "vat_payer": true
+  "cui": 12345678,
+  "name": "EXEMPLU SRL",
+  "caen": "6201",
+  "registration_date": "01.01.2020",
+  "vat_payer": false
 }
 ```
 
@@ -214,19 +214,19 @@ Company profile (`company.profile`) includes:
 ```json
 {
   "firma": {
-    "cui": 46632129,
-    "j": "J2022002206167",
-    "nume_mfinante": "TERRADOT S.R.L.",
-    "nume_recom": "TERRADOT S.R.L.",
+    "cui": 12345678,
+    "j": "J2018000000001",
+    "nume_mfinante": "EXEMPLU SRL",
+    "nume_recom": "EXEMPLU SRL",
     "profil": {
-      "data_inregistrare": "2022-08-11",
-      "stare_inregistrare": "INREGISTRAT din data 10.08.2022"
+      "data_inregistrare": "01.01.2020",
+      "stare_inregistrare": "INREGISTRAT din data 01.01.2020"
     }
   },
   "statut_tva": {
-    "curent": { "cod": 2, "label": "Plătitor TVA" }
+    "curent": { "cod": 1, "label": "Neplătitor TVA" }
   },
-  "tva_incasare": { "activ": true },
+  "tva_incasare": { "activ": false },
   "stare_inactiv": { "este_inactiv": false },
   "split_tva": { "activ": false },
   "meta": { "sursa": "anaf" }
