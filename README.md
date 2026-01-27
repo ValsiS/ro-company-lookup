@@ -7,8 +7,7 @@
 [![Total Downloads](https://img.shields.io/github/downloads/ValsiS/ro-company-lookup/total.svg?style=flat-square)](https://github.com/ValsiS/ro-company-lookup/releases)
 [![License](https://img.shields.io/github/license/ValsiS/ro-company-lookup.svg?style=flat-square)](LICENSE)
 
-A production-ready Laravel package that retrieves basic Romanian company data by CUI from ANAF public web services.
-Current version: `v0.1.1`.
+A production-ready Laravel package that retrieves Romanian company data by CUI from ANAF public web services. It returns clean DTOs, supports batching, caching, retries, circuit breaker, schema audit, and a very simple developer experience.
 
 ## Requirements
 
@@ -22,304 +21,287 @@ Current version: `v0.1.1`.
 | 8.3 | 12.x | [![PHP 8.3](https://img.shields.io/github/actions/workflow/status/ValsiS/ro-company-lookup/run-tests.yml?branch=main&label=php%208.3&style=flat-square)](https://github.com/ValsiS/ro-company-lookup/actions/workflows/run-tests.yml) |
 | 8.5 | 12.x | [![PHP 8.5](https://img.shields.io/github/actions/workflow/status/ValsiS/ro-company-lookup/run-tests.yml?branch=main&label=php%208.5&style=flat-square)](https://github.com/ValsiS/ro-company-lookup/actions/workflows/run-tests.yml) |
 
+## Quick start
+
+```bash
+composer require valsis/ro-company-lookup
+```
+
+```php
+use Valsis\RoCompanyLookup\Facades\RoCompanyLookup;
+
+return RoCompanyLookup::summaryOrResult('RO46632129');
+```
+
+Example response:
+
+```json
+{
+  "exists": true,
+  "cui": 46632129,
+  "name": "TERRADOT S.R.L.",
+  "caen": "6310",
+  "registration_date": "2022-08-11",
+  "vat_payer": true,
+  "status": "ok",
+  "message": null,
+  "error": null,
+  "code": null
+}
+```
+
 ## Installation
 
 ```bash
 composer require valsis/ro-company-lookup
 ```
 
-## Configuration
-
-Publish the config file:
+Publish the config file (optional):
 
 ```bash
 php artisan vendor:publish --tag=ro-company-lookup-config
 ```
 
-Config options include timeouts, retries, cache TTL, stale TTL, and raw payload access. Additional options:
+## Configuration
 
-- `timezone` (default `Europe/Bucharest`)
-- `language` (`ro` or `en` for output field naming)
-- `date_output_format` (default `Y-m-d`)
-- `date_output_formats` (per-language formats)
-- `use_locks` to toggle cache locks for single-flight protection
-- `cache_version` to force a cache bust across all keys
-- `batch_max_size` and `batch_chunk_size` for batching behavior
-- `logging` for PSR-3 request/response metadata logging
-- `circuit_breaker` for cooldown after repeated 5xx responses
+All configuration lives in `config/ro-company-lookup.php`.
+
+Core options:
+
+- `driver`: active driver, default `anaf`
+- `timezone`: default query date timezone, default `Europe/Bucharest`
+- `language`: output key naming, `ro` or `en`
+
+Date formatting:
+
+- `date_output_format`: fallback output format for dates (default `Y-m-d`)
+- `date_output_formats`: per-language formats (default `ro => d.m.Y`, `en => Y-m-d`)
+
+HTTP + ANAF:
+
+- `anaf.base_url`, `anaf.endpoint`, `anaf.timeout`, `anaf.connect_timeout`
+- `anaf.retries`, `anaf.backoff_ms`, `anaf.user_agent`
+
+Cache + resilience:
+
+- `cache_store`, `cache_prefix`, `cache_version`
+- `cache_ttl_seconds`, `stale_ttl_seconds`
+- `use_locks`, `lock_seconds`, `lock_wait_seconds`
+- `throttle_seconds` (optional per-CUI guard)
+
+Observability + safety:
+
+- `logging.enabled`, `logging.channel`, `logging.level`
+- `schema_audit.enabled`, `schema_audit.fail_on_unknown`, `schema_audit.snapshot_path`
+- `circuit_breaker.enabled`, `circuit_breaker.failure_threshold`, `circuit_breaker.cooldown_seconds`
+
+Raw payloads:
+
+- `enable_raw` (include raw ANAF payloads in `meta.raw`)
 
 ## Usage
+
+### Standard lookup
 
 ```php
 use Valsis\RoCompanyLookup\Facades\RoCompanyLookup;
 
 $company = RoCompanyLookup::lookup('RO123456');
-
-$companyWithDate = RoCompanyLookup::lookup('123456', new DateTimeImmutable('2024-01-10'));
+$company = RoCompanyLookup::lookup('123456', new DateTimeImmutable('2024-01-10'));
 ```
 
 The lookup accepts `RO123`, ` ro 123 `, or `123` and normalizes to an integer CUI. By default, the query date is "today" in `Europe/Bucharest`.
 
-If you prefer a non-throwing API, use `tryLookup()`:
+### Non-throwing API
 
 ```php
 $result = RoCompanyLookup::tryLookup('RO123456');
 
-if ($result->status === 'ok') {
+if ($result->exists()) {
     $company = $result->data;
 }
 ```
 
-## Documentation
+### Summary helpers (simplest UX)
 
-Full documentation is available in the repo wiki pages under `docs/wiki`. Start with:
+```php
+$summary = RoCompanyLookup::summary('RO123456');
+$summary = RoCompanyLookup::summaryOrNull('RO123456'); // null if not found
+$summary = RoCompanyLookup::summaryOrFail('RO123456'); // throws on invalid / not found
+$summary = RoCompanyLookup::summarySafe('RO123456');   // ['exists' => false] if not found
+$summary = RoCompanyLookup::summaryOrResult('RO123456');
+```
 
-- `docs/wiki/Home.md`
+### Batch helpers
 
-JSON Schema definitions (versioned) are available under `docs/schemas`.
+```php
+$companies = RoCompanyLookup::batch(['RO123', 'RO456'])->get();
+$results = RoCompanyLookup::batch(['RO123', 'BAD', 'RO456'])->tryGet();
 
-### Field naming & structure
+$summaries = RoCompanyLookup::batchSummary(['RO1', 'RO2']);
+$summaries = RoCompanyLookup::batchSummaryWithStatus(['RO1', 'RO2']);
+$summaries = RoCompanyLookup::batchSummaryMap(['RO1', 'RO2']);
+```
 
-Output follows the official ANAF field naming conventions (e.g., `firma`, `adresa`, `cod_caen`, `date_contact`, `forma_juridica`, `statut_tva`). Use the `language` config to switch between `ro` and `en` output keys. Internally you can still access properties using the original PHP property names.
+### Validation / normalization
 
-Example output (RO):
+```php
+$isValid = RoCompanyLookup::isValidCui('RO123456');
+$normalized = RoCompanyLookup::normalizeCui('  ro  123456 ');
+```
+
+### Date formatting (global + per request)
+
+Global (config):
+
+```php
+// config/ro-company-lookup.php
+'date_output_formats' => [
+    'ro' => 'd.m.Y',
+    'en' => 'Y-m-d',
+],
+```
+
+Per request override:
+
+```php
+$formatted = RoCompanyLookup::lookupFormatted('RO123456', format: 'd.m.Y', language: 'ro');
+$formatted = RoCompanyLookup::tryLookupFormatted('RO123456', format: 'Y-m-d', language: 'en');
+```
+
+## DTO structure (high level)
+
+The main response is `CompanySimpleData`:
+
+- `company` (CUI, names, trade register, profile)
+- `caen` (primary CAEN)
+- `address` (fiscal + registered office)
+- `contact` (phones, emails)
+- `legal` (current + history)
+- `vat` (current + history)
+- `vat_collection` (TVA la incasare)
+- `inactive_status` (inactiv/reactivat)
+- `split_vat`
+- `meta` (source, query date, cache status, raw)
+
+Company profile (`company.profile`) includes:
+
+- `registration_date`
+- `registration_status`
+- `fiscal_office`
+- `ownership_form`
+- `e_invoice_status`
+- `e_invoice_registration_date`
+- `iban`
+
+## Output examples
+
+### Summary response
+
+```json
+{
+  "exists": true,
+  "cui": 46632129,
+  "name": "TERRADOT S.R.L.",
+  "caen": "6310",
+  "registration_date": "2022-08-11",
+  "vat_payer": true
+}
+```
+
+### Full response (excerpt, RO)
 
 ```json
 {
   "firma": {
-    "cui": 33034700,
-    "j": "J2014000546297",
-    "nume_mfinante": "ACME SRL",
-    "nume_recom": "ACME SRL"
-  },
-  "adresa": {
-    "anaf": {
-      "formatat": "Strada Nicolae Titulescu, Nr. 32, Ploiești, Județ Prahova",
-      "judet": "Prahova",
-      "localitate": "Ploiești"
-    },
-    "sediu_social": {
-      "formatat": "Strada Nicolae Titulescu, Nr. 32, Ploiești, Județ Prahova",
-      "judet": "Prahova",
-      "localitate": "Ploiești"
+    "cui": 46632129,
+    "j": "J2022002206167",
+    "nume_mfinante": "TERRADOT S.R.L.",
+    "nume_recom": "TERRADOT S.R.L.",
+    "profil": {
+      "data_inregistrare": "2022-08-11",
+      "stare_inregistrare": "INREGISTRAT din data 10.08.2022"
     }
-  },
-  "cod_caen": {
-    "principal_mfinante": { "cod": "6311", "label": "Prelucrarea datelor..." },
-    "principal_recom": { "cod": "6310", "label": "Prelucrarea datelor...", "versiune": 3 }
-  },
-  "date_contact": {
-    "telefon": ["0344803100"],
-    "email": []
-  },
-  "forma_juridica": {
-    "curenta": { "data_actualizare": "2018-10-12T00:00:00Z", "denumire": "Societate cu Răspundere Limitată", "organizare": "SRL" },
-    "istoric": []
   },
   "statut_tva": {
-    "curent": { "cod": 2, "label": "Plătitor TVA", "data_interogare": "2026-01-26" },
-    "istoric": []
+    "curent": { "cod": 2, "label": "Plătitor TVA" }
   },
-  "meta": {
-    "sursa": "anaf",
-    "data_interogare": "2026-01-26T10:00:00Z",
-    "data_ceruta": "2026-01-26",
-    "este_stale": false,
-    "cache_hit": true
-  }
+  "tva_incasare": { "activ": true },
+  "stare_inactiv": { "este_inactiv": false },
+  "split_tva": { "activ": false },
+  "meta": { "sursa": "anaf" }
 }
 ```
 
-Example output (EN):
-
-```json
-{
-  "company": {
-    "cui": 33034700,
-    "trade_register_number": "J2014000546297",
-    "ministry_of_finance_name": "ACME SRL",
-    "recom_name": "ACME SRL"
-  },
-  "address": {
-    "anaf": {
-      "formatted_address": "Strada Nicolae Titulescu, Nr. 32, Ploiești, Județ Prahova",
-      "county": "Prahova",
-      "city": "Ploiești"
-    },
-    "registered_office": {
-      "formatted_address": "Strada Nicolae Titulescu, Nr. 32, Ploiești, Județ Prahova",
-      "county": "Prahova",
-      "city": "Ploiești"
-    }
-  },
-  "caen_code": {
-    "primary_ministry_of_finance": { "code": "6311", "label": "Data processing..." },
-    "primary_recom": { "code": "6310", "label": "Data processing...", "version": 3 }
-  },
-  "contact_details": {
-    "phone_numbers": ["0344803100"],
-    "emails": []
-  },
-  "legal_form": {
-    "current": { "updated_at": "2018-10-12T00:00:00Z", "name": "Limited Liability Company", "organization": "SRL" },
-    "history": []
-  },
-  "vat_status": {
-    "current": { "code": 2, "label": "Plătitor TVA", "queried_at": "2026-01-26" },
-    "history": []
-  },
-  "meta": {
-    "source": "anaf",
-    "queried_at": "2026-01-26T10:00:00Z",
-    "queried_for_date": "2026-01-26",
-    "is_stale": false,
-    "cache_hit": true
-  }
-}
-```
-
-Example batch response (RO, array of items):
-
-```json
-[
-  { "firma": { "cui": 123456 }, "meta": { "sursa": "anaf" } },
-  { "firma": { "cui": 789012 }, "meta": { "sursa": "anaf" } }
-]
-```
-
-### Batch lookup
-
-```php
-$companies = RoCompanyLookup::batch(['RO123', 'RO456'])->get();
-```
-
-ANAF supports up to 100 CUIs per request. The package enforces this limit.
-
-Soft batch lookup (no exceptions):
-
-```php
-$results = RoCompanyLookup::batch(['RO123', 'BAD', 'RO456'])->tryGet();
-```
-
-### Raw payload access
-
-To include raw ANAF payloads in the DTO meta object:
-
-```php
-// config/ro-company-lookup.php
-'enable_raw' => true,
-```
-
-You can also include raw data per command call with `--raw`.
-
-## Caching, retries, and stale fallback
+## Caching, retries, and resilience
 
 - Results are cached by driver + CUI + date.
 - Default cache TTL is 24 hours.
 - When a request fails and a stale cache entry exists (within the configured stale TTL), the stale entry is returned with `meta.is_stale = true`.
-- Bump `cache_version` to invalidate existing cache entries after a mapping change.
+- Bump `cache_version` to invalidate cache after mapping changes.
 - Retries use exponential backoff and only trigger on 429 and 5xx responses.
 - Circuit breaker (optional) opens after repeated 5xx responses and cools down for a configurable interval.
+- Optional `throttle_seconds` guards rapid repeated queries per CUI.
 
-## Response errors
+## Errors
 
 The package throws typed exceptions for error scenarios:
 
-- `InvalidCuiException` when the input cannot be normalized to a valid CUI.
-- `LookupFailedException` for upstream failures (timeouts, 429/5xx, invalid responses).
-- `CircuitOpenException` when the circuit breaker is open.
+- `InvalidCuiException` for invalid input
+- `LookupFailedException` for upstream failures
+- `CircuitOpenException` when the circuit is open
 
-Example (single lookup):
+For user-facing flows, prefer `tryLookup()` / `trySummary()` helpers.
 
-```php
-try {
-    $company = RoCompanyLookup::lookup('RO123456');
-} catch (\Valsis\RoCompanyLookup\Exceptions\InvalidCuiException $e) {
-    // Handle invalid input
-} catch (\Valsis\RoCompanyLookup\Exceptions\CircuitOpenException $e) {
-    // Service temporarily unavailable
-} catch (\Valsis\RoCompanyLookup\Exceptions\LookupFailedException $e) {
-    // Upstream failure
-}
-```
-
-For user-facing flows, consider `tryLookup()` which returns a `LookupResultData` with `status` values of `ok`, `not_found`, `invalid`, or `error`.
-
-For a compact summary payload, you can use the helpers:
-
-```php
-$summary = RoCompanyLookup::summary('RO123456');
-// or
-$summary = RoCompanyLookup::trySummary('RO123456')->summary();
-```
-
-Additional helpers:
-
-```php
-$summary = RoCompanyLookup::summaryOrNull('RO123456'); // null if not found
-$summary = RoCompanyLookup::summaryOrFail('RO123456'); // throws on invalid / not found
-$summaries = RoCompanyLookup::batchSummary(['RO1', 'RO2', 'RO3']);
-$summaryWithStatus = RoCompanyLookup::summaryOrResult('RO123456');
-$summariesWithStatus = RoCompanyLookup::batchSummaryWithStatus(['RO1', 'RO2']);
-$isValid = RoCompanyLookup::isValidCui('RO123456');
-$summarySafe = RoCompanyLookup::summarySafe('RO123456'); // returns ['exists' => false] if not found
-$summaryMap = RoCompanyLookup::batchSummaryMap(['RO1', 'RO2']);
-$formatted = RoCompanyLookup::lookupFormatted('RO123456', format: 'd.m.Y', language: 'ro');
-```
-
-## Artisan command
+## Artisan commands
 
 ```bash
 php artisan ro-company-lookup:check 123456 --date=2024-01-10 --raw
-```
-
-The command outputs JSON to stdout.
-
-You can also run a compact demo summary:
-
-```bash
 php artisan ro-company-lookup:demo 123456
 ```
 
-The demo command prints just the core fields (exists, name, CUI, CAEN, registration date, VAT payer).
+## Schema audit
+
+Enable unknown-key detection and optional snapshots:
+
+```php
+'schema_audit' => [
+    'enabled' => true,
+    'fail_on_unknown' => false,
+    'snapshot_path' => storage_path('logs/anaf-schema'),
+],
+```
+
+## Documentation
+
+- Full docs: `docs/wiki/Home.md`
+- JSON Schemas: `docs/schemas`
 
 ## Testing
 
 ```bash
 composer test
-```
-
-Other useful scripts:
-
-```bash
 composer lint
 composer analyse
 composer ci
 ```
 
-## Troubleshooting
-
-- Ensure outbound HTTPS access to `webservicesp.anaf.ro`.
-- Increase `timeout`/`connect_timeout` for slow environments.
-- Use `enable_raw` to inspect the underlying ANAF response when debugging mapping issues.
-
 ## Changelog
 
-Please see [CHANGELOG.md](CHANGELOG.md) for more information on what has changed recently.
+See [CHANGELOG.md](CHANGELOG.md).
 
 ## Contributing
 
-Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
-We use Dependabot for dependency updates.
+See [CONTRIBUTING.md](CONTRIBUTING.md). Dependabot is enabled.
 
 ## Code of Conduct
 
-Please see [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for details.
+See [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 
 ## Security
 
-Please review [SECURITY.md](SECURITY.md) on how to report security vulnerabilities.
+See [SECURITY.md](SECURITY.md).
 
 ## License
 
-The MIT License (MIT). Please see [LICENSE](LICENSE) for more information.
+The MIT License (MIT). See [LICENSE](LICENSE).
