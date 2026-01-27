@@ -20,6 +20,7 @@ use Valsis\RoCompanyLookup\Exceptions\InvalidCuiException;
 use Valsis\RoCompanyLookup\Exceptions\LookupFailedException;
 use Valsis\RoCompanyLookup\Support\CacheKey;
 use Valsis\RoCompanyLookup\Support\DateHelper;
+use Valsis\RoCompanyLookup\Support\LanguageHelper;
 use Valsis\RoCompanyLookup\Support\NormalizeCui;
 
 class RoCompanyLookupManager extends Manager
@@ -359,6 +360,38 @@ class RoCompanyLookupManager extends Manager
     public function normalizeCui(int|string $cui): int
     {
         return NormalizeCui::normalize($cui);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function lookupFormatted(
+        int|string $cui,
+        ?DateTimeInterface $date = null,
+        ?string $format = null,
+        ?string $language = null
+    ): array {
+        return LanguageHelper::withLanguage($language, function () use ($cui, $date, $format, $language) {
+            return DateHelper::withOutputFormat($language, $format, function () use ($cui, $date) {
+                return $this->lookup($cui, $date)->toArray();
+            });
+        });
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function tryLookupFormatted(
+        int|string $cui,
+        ?DateTimeInterface $date = null,
+        ?string $format = null,
+        ?string $language = null
+    ): array {
+        return LanguageHelper::withLanguage($language, function () use ($cui, $date, $format, $language) {
+            return DateHelper::withOutputFormat($language, $format, function () use ($cui, $date) {
+                return $this->tryLookup($cui, $date)->toArray();
+            });
+        });
     }
 
     /**

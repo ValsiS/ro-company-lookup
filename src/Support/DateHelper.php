@@ -42,9 +42,43 @@ class DateHelper
             return null;
         }
 
-        $format = (string) config('ro-company-lookup.date_output_format', 'Y-m-d');
+        $format = self::resolveOutputFormat();
 
         return $date->format($format);
+    }
+
+    public static function resolveOutputFormat(?string $language = null, ?string $override = null): string
+    {
+        if (is_string($override) && $override !== '') {
+            return $override;
+        }
+
+        $language = $language ?: (string) config('ro-company-lookup.language', 'ro');
+        $formats = config('ro-company-lookup.date_output_formats', []);
+        if (is_array($formats) && isset($formats[$language]) && is_string($formats[$language])) {
+            return $formats[$language];
+        }
+
+        return (string) config('ro-company-lookup.date_output_format', 'Y-m-d');
+    }
+
+    /**
+     * @template T
+     *
+     * @param  callable():T  $callback
+     * @return T
+     */
+    public static function withOutputFormat(?string $language, ?string $override, callable $callback): mixed
+    {
+        $previous = config('data.date_format');
+        $format = self::resolveOutputFormat($language, $override);
+        config(['data.date_format' => $format]);
+
+        try {
+            return $callback();
+        } finally {
+            config(['data.date_format' => $previous]);
+        }
     }
 
     public static function parseDate(?string $value): ?DateTimeImmutable

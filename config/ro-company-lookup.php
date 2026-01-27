@@ -7,6 +7,10 @@ return [
     'timezone' => 'Europe/Bucharest',
     'language' => 'ro',
     'date_output_format' => 'Y-m-d',
+    'date_output_formats' => [
+        'ro' => 'd.m.Y',
+        'en' => 'Y-m-d',
+    ],
 
     'anaf' => [
         'base_url' => 'https://webservicesp.anaf.ro',

@@ -110,6 +110,18 @@ class SummaryHelperTest extends TestCase
         $this->assertSame(456, $summaries['RO456']['cui']);
     }
 
+    #[Test]
+    public function it_formats_dates_per_request(): void
+    {
+        Http::fake([
+            'webservicesp.anaf.ro/*' => Http::response($this->fixture('anaf_v9_single.json'), 200),
+        ]);
+
+        $formatted = RoCompanyLookup::lookupFormatted('RO46632129', format: 'd.m.Y', language: 'ro');
+
+        $this->assertSame('11.08.2022', $formatted['firma']['profil']['data_inregistrare']);
+    }
+
     /**
      * @return array<string, mixed>
      */

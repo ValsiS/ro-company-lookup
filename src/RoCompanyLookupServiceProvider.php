@@ -33,6 +33,9 @@ class RoCompanyLookupServiceProvider extends PackageServiceProvider
 
     public function packageBooted(): void
     {
+        $format = \Valsis\RoCompanyLookup\Support\DateHelper::resolveOutputFormat();
+        config(['data.date_format' => $format]);
+
         $this->publishes([
             __DIR__.'/../config/ro-company-lookup.php' => config_path('ro-company-lookup.php'),
         ], 'ro-company-lookup-config');

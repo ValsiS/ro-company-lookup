@@ -41,6 +41,7 @@ Config options include timeouts, retries, cache TTL, stale TTL, and raw payload 
 - `timezone` (default `Europe/Bucharest`)
 - `language` (`ro` or `en` for output field naming)
 - `date_output_format` (default `Y-m-d`)
+- `date_output_formats` (per-language formats)
 - `use_locks` to toggle cache locks for single-flight protection
 - `cache_version` to force a cache bust across all keys
 - `batch_max_size` and `batch_chunk_size` for batching behavior
@@ -263,6 +264,7 @@ $summariesWithStatus = RoCompanyLookup::batchSummaryWithStatus(['RO1', 'RO2']);
 $isValid = RoCompanyLookup::isValidCui('RO123456');
 $summarySafe = RoCompanyLookup::summarySafe('RO123456'); // returns ['exists' => false] if not found
 $summaryMap = RoCompanyLookup::batchSummaryMap(['RO1', 'RO2']);
+$formatted = RoCompanyLookup::lookupFormatted('RO123456', format: 'd.m.Y', language: 'ro');
 ```
 
 ## Artisan command
