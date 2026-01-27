@@ -13,13 +13,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Renamed address output to `domiciliu_fiscal` / `fiscal_domicile` and aligned address fields with ANAF v9.
 - Updated JSON Schemas and docs to match the new output shape.
 
-## [0.3.0] - 2026-01-27
-
-- Renamed DTO output keys to general, ANAF-aligned naming (removed non-ANAF fields).
-- Simplified CAEN output to a single entry from ANAF v9 payloads.
-- Renamed address output to `domiciliu_fiscal` / `fiscal_domicile` and aligned address fields with ANAF v9.
-- Updated JSON Schemas and docs to match the new output shape.
-
 ## [0.2.0] - 2026-01-27
 
 - Added company profile data derived from ANAF general information.
