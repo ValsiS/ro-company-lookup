@@ -20,6 +20,8 @@ All configuration lives in `config/ro-company-lookup.php`.
 - `anaf.backoff_ms`: base backoff in ms (exponential)
 - `anaf.user_agent`: user agent string
 
+Mapping is strict to ANAF v9 response keys. Legacy/alternate key names are intentionally not mapped.
+
 ## Cache
 
 - `cache_store`: null for default store or a named store

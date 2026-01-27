@@ -7,7 +7,7 @@
 
 ## Missing fields
 
-ANAF does not always return every field. The package maps defensively and may return nulls for optional values.
+ANAF does not always return every field. The package maps defensively and may return nulls for optional values. Mapping is strict to ANAF v9 keys, so legacy/alternate key names are not mapped.
 
 ## Inspect raw payload
 

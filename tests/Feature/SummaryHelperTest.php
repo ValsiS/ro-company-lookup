@@ -23,7 +23,7 @@ class SummaryHelperTest extends TestCase
         $this->assertSame(123456, $summary['cui']);
         $this->assertSame('ACME SRL', $summary['name']);
         $this->assertSame('6201', $summary['caen']);
-        $this->assertNull($summary['registration_date']);
+        $this->assertSame('01.01.2010', $summary['registration_date']);
         $this->assertTrue($summary['vat_payer']);
     }
 

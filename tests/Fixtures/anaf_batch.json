@@ -1,20 +1,66 @@
 {
   "found": [
     {
-      "cui": 123,
-      "denumire": "ACME SRL",
-      "nrRegCom": "J40/1/2010",
-      "tva": {
-        "scpTVA": true
+      "date_generale": {
+        "data": "2024-01-10",
+        "cui": 123,
+        "denumire": "ACME SRL",
+        "adresa": "STR. EXEMPLU, NR. 1, BUCURESTI",
+        "telefon": "",
+        "fax": "",
+        "codPostal": "",
+        "act": "",
+        "stare_inregistrare": "INREGISTRAT din data 01.01.2010",
+        "data_inreg_Reg_RO_e_Factura": "",
+        "organFiscalCompetent": "Administratia Test",
+        "forma_de_proprietate": "PROPR.PRIVATA",
+        "forma_organizare": "PERSOANA JURIDICA",
+        "forma_juridica": "SOCIETATE CU RASPUNDERE LIMITATA",
+        "statusRO_e_Factura": false,
+        "data_inregistrare": "2010-01-01",
+        "nrRegCom": "J40/123/2010",
+        "cod_CAEN": "6201",
+        "iban": ""
+      },
+      "inregistrare_scop_Tva": {
+        "scpTVA": false,
+        "perioade_TVA": []
       }
     },
     {
-      "cui": 456,
-      "denumire": "BETA SRL",
-      "nrRegCom": "J40/2/2011",
-      "tva": {
-        "scpTVA": false
+      "date_generale": {
+        "data": "2024-01-10",
+        "cui": 456,
+        "denumire": "BETA SRL",
+        "adresa": "STR. SECUNDARA, NR. 2, BUCURESTI",
+        "telefon": "",
+        "fax": "",
+        "codPostal": "",
+        "act": "",
+        "stare_inregistrare": "INREGISTRAT din data 01.01.2012",
+        "data_inreg_Reg_RO_e_Factura": "",
+        "organFiscalCompetent": "Administratia Test",
+        "forma_de_proprietate": "PROPR.PRIVATA",
+        "forma_organizare": "PERSOANA JURIDICA",
+        "forma_juridica": "SOCIETATE CU RASPUNDERE LIMITATA",
+        "statusRO_e_Factura": false,
+        "data_inregistrare": "2012-01-01",
+        "nrRegCom": "J40/456/2012",
+        "cod_CAEN": "6202",
+        "iban": ""
+      },
+      "inregistrare_scop_Tva": {
+        "scpTVA": true,
+        "perioade_TVA": [
+          {
+            "data_inceput_ScpTVA": "2015-01-01",
+            "data_sfarsit_ScpTVA": "",
+            "data_anul_imp_ScpTVA": "",
+            "mesaj_ScpTVA": ""
+          }
+        ]
       }
     }
-  ]
+  ],
+  "notFound": []
 }

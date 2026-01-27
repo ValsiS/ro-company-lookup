@@ -112,6 +112,8 @@ $company = RoCompanyLookup::lookup('123456', new DateTimeImmutable('2024-01-10')
 
 The lookup accepts `RO123`, ` ro 123 `, or `123` and normalizes to an integer CUI. By default, the query date is "today" in `Europe/Bucharest`.
 
+ANAF mapping is strict to the v9 payload fields (`date_generale`, `inregistrare_scop_Tva`, `adresa_domiciliu_fiscal`, `adresa_sediu_social`, etc.). Legacy/alternate key names are intentionally not mapped.
+
 ### Non-throwing API
 
 ```php

@@ -34,7 +34,7 @@ class LookupTest extends TestCase
         $this->assertSame('ACME SRL', $result->company->name_mfinante);
         $this->assertSame('J40/123/2010', $result->company->registration_number);
         $this->assertSame('6201', $result->caen->principal_mfinante?->code);
-        $this->assertSame('office@acme.test', $result->contact->emails[0] ?? null);
+        $this->assertSame('0211234567', $result->contact->phones[0] ?? null);
         $this->assertSame(2, $result->vat->current?->code);
         $this->assertSame('Bucuresti', $result->address->anaf?->county);
         $this->assertSame('2024-01-10', $result->meta->queried_for_date);

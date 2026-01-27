@@ -1,52 +1,83 @@
 {
   "found": [
     {
-      "cui": 123456,
-      "denumire": "ACME SRL",
-      "nrRegCom": "J40/123/2010",
-      "caen": "6201",
-      "telefon": "0211234567",
-      "email": "office@acme.test",
-      "domiciliu_fiscal": {
-        "adresa": "Str. Exemplu 1, Bucuresti",
-        "judet": "Bucuresti",
-        "localitate": "Bucuresti",
-        "sector": "1",
-        "strada": "Str. Exemplu",
-        "numar": "1",
-        "cod_postal": "010101"
+      "date_generale": {
+        "data": "2024-01-10",
+        "cui": 123456,
+        "denumire": "ACME SRL",
+        "adresa": "STR. EXEMPLU, NR. 1, BUCURESTI",
+        "telefon": "0211234567",
+        "fax": "",
+        "codPostal": "010101",
+        "act": "",
+        "stare_inregistrare": "INREGISTRAT din data 01.01.2010",
+        "data_inreg_Reg_RO_e_Factura": "",
+        "organFiscalCompetent": "Administratia Test",
+        "forma_de_proprietate": "PROPR.PRIVATA",
+        "forma_organizare": "PERSOANA JURIDICA",
+        "forma_juridica": "SOCIETATE CU RASPUNDERE LIMITATA",
+        "statusRO_e_Factura": false,
+        "data_inregistrare": "2010-01-01",
+        "nrRegCom": "J40/123/2010",
+        "cod_CAEN": "6201",
+        "iban": ""
       },
-      "sediu_social": {
-        "adresa": "Str. Secundara 2, Bucuresti",
-        "judet": "Bucuresti",
-        "localitate": "Bucuresti",
-        "sector": "2",
-        "strada": "Str. Secundara",
-        "numar": "2",
-        "cod_postal": "020202"
-      },
-      "tva": {
+      "inregistrare_scop_Tva": {
         "scpTVA": true,
-        "data_inceput": "2020-01-01",
-        "data_sfarsit": null,
-        "data_actualizare": "2024-01-10",
-        "history": [
+        "perioade_TVA": [
           {
-            "data_inceput": "2018-01-01",
-            "data_sfarsit": "2019-12-31",
-            "scpTVA": false
-          },
-          {
-            "data_inceput": "2020-01-01",
-            "data_sfarsit": null,
-            "scpTVA": true
+            "data_inceput_ScpTVA": "2020-01-01",
+            "data_sfarsit_ScpTVA": "",
+            "data_anul_imp_ScpTVA": "",
+            "mesaj_ScpTVA": ""
           }
         ]
       },
-      "forma_juridica": "SRL",
-      "organizare": "PERSOANA JURIDICA",
-      "data_actualizare": "2024-01-10"
+      "inregistrare_RTVAI": {
+        "dataActualizareTvaInc": "",
+        "dataPublicareTvaInc": "",
+        "dataInceputTvaInc": "",
+        "dataSfarsitTvaInc": "",
+        "tipActTvaInc": "",
+        "statusTvaIncasare": false
+      },
+      "stare_inactiv": {
+        "dataInactivare": "",
+        "dataReactivare": "",
+        "dataPublicare": "",
+        "dataRadiere": "",
+        "statusInactivi": false
+      },
+      "inregistrare_SplitTVA": {
+        "statusSplitTVA": false,
+        "dataInceputSplitTVA": "",
+        "dataAnulareSplitTVA": ""
+      },
+      "adresa_sediu_social": {
+        "stara": "",
+        "sdenumire_Localitate": "Bucuresti",
+        "sdenumire_Strada": "Str. Secundara",
+        "snumar_Strada": "2",
+        "scod_Localitate": "101",
+        "sdenumire_Judet": "Bucuresti",
+        "scod_Judet": "40",
+        "scod_JudetAuto": "B",
+        "sdetalii_Adresa": "",
+        "scod_Postal": "020202"
+      },
+      "adresa_domiciliu_fiscal": {
+        "dtara": "",
+        "ddenumire_Localitate": "Bucuresti",
+        "ddenumire_Strada": "Str. Exemplu",
+        "dnumar_Strada": "1",
+        "dcod_Localitate": "101",
+        "ddenumire_Judet": "Bucuresti",
+        "dcod_Judet": "40",
+        "dcod_JudetAuto": "B",
+        "ddetalii_Adresa": "",
+        "dcod_Postal": "010101"
+      }
     }
   ],
-  "notfound": []
+  "notFound": []
 }

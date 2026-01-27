@@ -176,14 +176,6 @@ class AnafDriver implements RoCompanyLookupDriver
             if (isset($raw['found']) && is_array($raw['found'])) {
                 return $raw['found'];
             }
-
-            if (isset($raw['data']) && is_array($raw['data'])) {
-                return $raw['data'];
-            }
-
-            if (isset($raw['date']) && is_array($raw['date'])) {
-                return $raw['date'];
-            }
         }
 
         return [];
@@ -202,9 +194,6 @@ class AnafDriver implements RoCompanyLookupDriver
             $general = is_array($entry['date_generale'] ?? null) ? $entry['date_generale'] : null;
             $entryCui = (int) (
                 $entry['cui']
-                ?? $entry['cod']
-                ?? $entry['codFiscal']
-                ?? $entry['cod_fiscal']
                 ?? $general['cui']
                 ?? 0
             );
@@ -222,9 +211,9 @@ class AnafDriver implements RoCompanyLookupDriver
     protected function mapEntry(array $entry, int $cui): CompanySimpleData
     {
         $general = is_array($entry['date_generale'] ?? null) ? $entry['date_generale'] : null;
-        $name = $this->firstValue($general ?? $entry, ['denumire', 'nume', 'name']);
-        $nrRegCom = $this->firstValue($general ?? $entry, ['nrRegCom', 'nr_reg_com', 'nr_reg_comert']);
-        $caen = $this->firstValue($general ?? $entry, ['cod_CAEN', 'cod_caen', 'caen']);
+        $name = $this->firstValue($general ?? [], ['denumire']);
+        $nrRegCom = $this->firstValue($general ?? [], ['nrRegCom']);
+        $caen = $this->firstValue($general ?? [], ['cod_CAEN']);
 
         $profile = $this->mapProfile($general);
 
@@ -244,40 +233,32 @@ class AnafDriver implements RoCompanyLookupDriver
 
         $contact = new ContactData(
             phones: array_filter([
-                $this->firstValue($general ?? $entry, ['telefon', 'phone', 'tel']),
-                $this->firstValue($general ?? $entry, ['fax']),
+                $this->firstValue($general ?? [], ['telefon']),
+                $this->firstValue($general ?? [], ['fax']),
             ], static fn ($value) => $value !== null && $value !== ''),
             emails: array_filter([
-                $this->firstValue($general ?? $entry, ['email', 'emailAddress']),
+                $this->firstValue($general ?? [], ['email']),
             ], static fn ($value) => $value !== null && $value !== '')
         );
 
-        $vatData = Arr::get($entry, 'tva')
-            ?? Arr::get($entry, 'scpTVA')
-            ?? Arr::get($entry, 'vat')
-            ?? Arr::get($entry, 'inregistrare_scop_Tva');
-        $queriedAt = DateHelper::parseDate($this->firstValue($general ?? $entry, ['data', 'data_interogare']));
+        $vatData = Arr::get($entry, 'inregistrare_scop_Tva');
+        $queriedAt = DateHelper::parseDate($this->firstValue($general ?? [], ['data']));
         $this->auditEntry($entry, $cui, $queriedAt);
         $vatCollection = $this->mapVatCollection(Arr::get($entry, 'inregistrare_RTVAI'));
         $inactiveStatus = $this->mapInactiveStatus(Arr::get($entry, 'stare_inactiv'));
         $splitVat = $this->mapSplitVat(Arr::get($entry, 'inregistrare_SplitTVA'));
         $vat = $this->mapVat($vatData, $queriedAt);
 
-        $domiciliuRaw = Arr::get($entry, 'domiciliu_fiscal')
-            ?? Arr::get($entry, 'domiciliuFiscal')
-            ?? Arr::get($entry, 'adresa_domiciliu_fiscal')
-            ?? Arr::get($general ?? [], 'adresa')
-            ?? Arr::get($entry, 'adresa');
-        $sediuRaw = Arr::get($entry, 'sediu_social')
-            ?? Arr::get($entry, 'sediuSocial')
-            ?? Arr::get($entry, 'adresa_sediu_social');
+        $domiciliuRaw = Arr::get($entry, 'adresa_domiciliu_fiscal')
+            ?? Arr::get($general ?? [], 'adresa');
+        $sediuRaw = Arr::get($entry, 'adresa_sediu_social');
 
         $addresses = new AddressSetData(
             anaf: $this->mapAddress($domiciliuRaw),
             registered_office: $this->mapAddress($sediuRaw)
         );
 
-        $legal = $this->mapLegal($general ? array_merge($entry, $general) : $entry);
+        $legal = $this->mapLegal($general ?? []);
 
         return new CompanySimpleData(
             address: $addresses,
@@ -394,124 +375,6 @@ class AnafDriver implements RoCompanyLookupDriver
     {
         return $this->normalizeSchema([
             'cui',
-            'cod',
-            'codFiscal',
-            'cod_fiscal',
-            'denumire',
-            'nume',
-            'name',
-            'nrRegCom',
-            'nr_reg_com',
-            'nr_reg_comert',
-            'caen',
-            'cod_CAEN',
-            'cod_caen',
-            'telefon',
-            'email',
-            'fax',
-            'adresa',
-            'domiciliu_fiscal' => [
-                'adresa',
-                'judet',
-                'localitate',
-                'sector',
-                'strada',
-                'numar',
-                'cod_postal',
-                'tara',
-                'tip_strada',
-                'bloc',
-                'scara',
-                'etaj',
-                'apartament',
-                'cod_siruta',
-            ],
-            'domiciliuFiscal' => [
-                'adresa',
-                'judet',
-                'localitate',
-                'sector',
-                'strada',
-                'numar',
-                'cod_postal',
-                'tara',
-                'tip_strada',
-                'bloc',
-                'scara',
-                'etaj',
-                'apartament',
-                'cod_siruta',
-            ],
-            'sediu_social' => [
-                'adresa',
-                'judet',
-                'localitate',
-                'sector',
-                'strada',
-                'numar',
-                'cod_postal',
-                'tara',
-                'tip_strada',
-                'bloc',
-                'scara',
-                'etaj',
-                'apartament',
-                'cod_siruta',
-            ],
-            'sediuSocial' => [
-                'adresa',
-                'judet',
-                'localitate',
-                'sector',
-                'strada',
-                'numar',
-                'cod_postal',
-                'tara',
-                'tip_strada',
-                'bloc',
-                'scara',
-                'etaj',
-                'apartament',
-                'cod_siruta',
-            ],
-            'tva' => [
-                'scpTVA',
-                'data_inceput',
-                'data_sfarsit',
-                'data_actualizare',
-                'history' => [
-                    'scpTVA',
-                    'data_inceput',
-                    'data_sfarsit',
-                ],
-                'istoric' => [
-                    'scpTVA',
-                    'data_inceput',
-                    'data_sfarsit',
-                ],
-            ],
-            'vat' => [
-                'scpTVA',
-                'data_inceput',
-                'data_sfarsit',
-                'data_actualizare',
-                'history' => [
-                    'scpTVA',
-                    'data_inceput',
-                    'data_sfarsit',
-                ],
-                'istoric' => [
-                    'scpTVA',
-                    'data_inceput',
-                    'data_sfarsit',
-                ],
-            ],
-            'scpTVA',
-            'forma_juridica',
-            'organizare',
-            'data_actualizare',
-            'legal_history',
-            'istoric_forme',
             'date_generale' => [
                 'data',
                 'cui',
@@ -667,7 +530,6 @@ class AnafDriver implements RoCompanyLookupDriver
         $isVatPayer = null;
 
         if (is_array($vatData)) {
-            $hasPeriods = isset($vatData['perioade_TVA']) && is_array($vatData['perioade_TVA']);
             if (isset($vatData['perioade_TVA']) && is_array($vatData['perioade_TVA'])) {
                 $periods = $vatData['perioade_TVA'];
                 foreach ($periods as $period) {
@@ -686,33 +548,8 @@ class AnafDriver implements RoCompanyLookupDriver
                 }
             }
 
-            $isVatPayer = $this->normalizeBool($this->firstValue($vatData, ['scpTVA', 'is_vat_payer', 'tva']));
-            $startDate = $hasPeriods
-                ? null
-                : DateHelper::parseDate($this->firstValue($vatData, ['data_inceput', 'start_date', 'data_inceput_tva']));
-            $endDate = $hasPeriods
-                ? null
-                : DateHelper::parseDate($this->firstValue($vatData, ['data_sfarsit', 'end_date', 'data_anulare_tva']));
-
-            $current = $this->vatEntryFromStatus($isVatPayer, $startDate, $endDate, $queriedAt);
-
-            $history = $vatData['history'] ?? $vatData['istoric'] ?? [];
-            if (is_array($history)) {
-                foreach ($history as $entry) {
-                    if (! is_array($entry)) {
-                        continue;
-                    }
-
-                    $entryVat = $this->normalizeBool($this->firstValue($entry, ['scpTVA', 'is_vat_payer']));
-                    $entryStart = DateHelper::parseDate($this->firstValue($entry, ['data_inceput', 'start_date', 'data_inceput_tva']));
-                    $entryEnd = DateHelper::parseDate($this->firstValue($entry, ['data_sfarsit', 'end_date', 'data_anulare_tva']));
-
-                    $entryData = $this->vatEntryFromStatus($entryVat, $entryStart, $entryEnd, $queriedAt);
-                    if ($entryData !== null) {
-                        $historyEntries[] = $entryData;
-                    }
-                }
-            }
+            $isVatPayer = $this->normalizeBool($this->firstValue($vatData, ['scpTVA']));
+            $current = $this->vatEntryFromStatus($isVatPayer, null, null, $queriedAt);
         }
 
         if (count($historyEntries) > 0 && $isVatPayer !== false) {
@@ -797,38 +634,20 @@ class AnafDriver implements RoCompanyLookupDriver
      */
     protected function mapLegal(array $entry): LegalData
     {
-        $forma = $this->firstValue($entry, ['forma_juridica', 'formaJuridica']);
-        $organizare = $this->firstValue($entry, ['organizare', 'forma_organizare']);
-        $updatedAt = DateHelper::parseDate($this->firstValue($entry, ['data_actualizare', 'updated_at']));
-
+        $forma = $this->firstValue($entry, ['forma_juridica']);
+        $organizare = $this->firstValue($entry, ['forma_organizare']);
         $current = null;
-        if ($forma !== null || $organizare !== null || $updatedAt !== null) {
+        if ($forma !== null || $organizare !== null) {
             $current = new LegalHistoryEntryData(
-                updated_at: $updatedAt,
+                updated_at: null,
                 name: $forma,
                 organization: $organizare
             );
         }
 
-        $historyEntries = [];
-        $history = $entry['istoric_forme'] ?? $entry['legal_history'] ?? [];
-        if (is_array($history)) {
-            foreach ($history as $historyEntry) {
-                if (! is_array($historyEntry)) {
-                    continue;
-                }
-
-                $historyEntries[] = new LegalHistoryEntryData(
-                    updated_at: DateHelper::parseDate($this->firstValue($historyEntry, ['data_actualizare', 'data', 'effective_date'])),
-                    name: $this->firstValue($historyEntry, ['denumire', 'forma_juridica', 'formaJuridica']),
-                    organization: $this->firstValue($historyEntry, ['organizare', 'forma_organizare'])
-                );
-            }
-        }
-
         return new LegalData(
             current: $current,
-            history: new DataCollection(LegalHistoryEntryData::class, $historyEntries)
+            history: new DataCollection(LegalHistoryEntryData::class, [])
         );
     }
 
@@ -863,30 +682,27 @@ class AnafDriver implements RoCompanyLookupDriver
             return null;
         }
 
-        $formatted = $this->firstValue($address, ['formatat', 'adresa', 'address', 'formatted']);
-        $raw = $this->firstValue($address, ['neprelucrat', 'raw', 'adresa', 'address']);
-        $rawMf = $this->firstValue($address, ['neprelucrat_mf']);
-        $rawRecom = $this->firstValue($address, ['neprelucrat_recom']);
+        $formatted = $this->firstValue($address, ['adresa']);
+        $raw = null;
+        $rawMf = null;
+        $rawRecom = null;
         $expiration = $this->mapExpiration($address['expirare'] ?? null);
 
-        $isD = array_key_exists('ddenumire_Judet', $address);
-        $isS = array_key_exists('sdenumire_Judet', $address);
-
-        $country = $this->firstValue($address, ['tara', 'country', 'dtara', 'stara']);
-        $county = $this->firstValue($address, ['judet', 'county', 'ddenumire_Judet', 'sdenumire_Judet']);
-        $city = $this->firstValue($address, ['localitate', 'oras', 'city', 'ddenumire_Localitate', 'sdenumire_Localitate']);
-        $subLocality = $this->firstValue($address, ['sub_localitate']);
-        $sector = $this->firstValue($address, ['sector']);
-        $street = $this->firstValue($address, ['strada', 'street', 'ddenumire_Strada', 'sdenumire_Strada']);
-        $streetType = $this->firstValue($address, ['tip_strada']);
-        $number = $this->firstValue($address, ['numar', 'number', 'dnumar_Strada', 'snumar_Strada']);
-        $building = $this->firstValue($address, ['bloc', 'building']);
-        $entrance = $this->firstValue($address, ['scara', 'entrance']);
-        $floor = $this->firstValue($address, ['etaj', 'floor']);
-        $apartment = $this->firstValue($address, ['apartament', 'apartment']);
-        $postalCode = $this->firstValue($address, ['cod_postal', 'postal_code', 'dcod_Postal', 'scod_Postal']);
-        $sirutaCode = $this->firstValue($address, ['cod_siruta', 'dcod_Localitate', 'scod_Localitate']);
-        $source = $this->firstValue($address, ['sursa']);
+        $country = $this->firstValue($address, ['dtara', 'stara']);
+        $county = $this->firstValue($address, ['ddenumire_Judet', 'sdenumire_Judet']);
+        $city = $this->firstValue($address, ['ddenumire_Localitate', 'sdenumire_Localitate']);
+        $subLocality = $this->firstValue($address, ['ddetalii_Adresa', 'sdetalii_Adresa']);
+        $sector = null;
+        $street = $this->firstValue($address, ['ddenumire_Strada', 'sdenumire_Strada']);
+        $streetType = null;
+        $number = $this->firstValue($address, ['dnumar_Strada', 'snumar_Strada']);
+        $building = null;
+        $entrance = null;
+        $floor = null;
+        $apartment = null;
+        $postalCode = $this->firstValue($address, ['dcod_Postal', 'scod_Postal']);
+        $sirutaCode = $this->firstValue($address, ['dcod_Localitate', 'scod_Localitate']);
+        $source = null;
 
         if ($formatted === null) {
             $formatted = $this->formatAddressFromParts(
