@@ -40,6 +40,7 @@ Config options include timeouts, retries, cache TTL, stale TTL, and raw payload 
 
 - `timezone` (default `Europe/Bucharest`)
 - `language` (`ro` or `en` for output field naming)
+- `date_output_format` (default `Y-m-d`)
 - `use_locks` to toggle cache locks for single-flight protection
 - `cache_version` to force a cache bust across all keys
 - `batch_max_size` and `batch_chunk_size` for batching behavior

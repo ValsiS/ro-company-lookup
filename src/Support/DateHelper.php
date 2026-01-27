@@ -36,6 +36,17 @@ class DateHelper
         return $date->format('Y-m-d');
     }
 
+    public static function formatOutputDate(?DateTimeInterface $date): ?string
+    {
+        if ($date === null) {
+            return null;
+        }
+
+        $format = (string) config('ro-company-lookup.date_output_format', 'Y-m-d');
+
+        return $date->format($format);
+    }
+
     public static function parseDate(?string $value): ?DateTimeImmutable
     {
         if (! $value) {

@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Added summary helpers and batch summary utilities.
 - Added summary helpers with status and CUI validation utility.
 - Added safe summary, keyed batch summaries, and optional per-CUI throttle guard.
+- Added configurable output date format for summaries.
 
 ## [0.1.9] - 2026-01-27
 

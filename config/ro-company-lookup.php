@@ -6,6 +6,7 @@ return [
     'driver' => 'anaf',
     'timezone' => 'Europe/Bucharest',
     'language' => 'ro',
+    'date_output_format' => 'Y-m-d',
 
     'anaf' => [
         'base_url' => 'https://webservicesp.anaf.ro',

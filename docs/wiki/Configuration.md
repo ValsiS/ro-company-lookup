@@ -7,6 +7,7 @@ All configuration lives in `config/ro-company-lookup.php`.
 - `driver`: active driver, default `anaf`
 - `timezone`: used when no date is provided, default `Europe/Bucharest`
 - `language`: output key naming, `ro` or `en`
+- `date_output_format`: output format for dates in summaries (default `Y-m-d`)
 
 ## ANAF HTTP
 

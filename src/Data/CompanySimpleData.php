@@ -41,7 +41,9 @@ class CompanySimpleData extends Data
             'cui' => $this->company->cui,
             'name' => $this->company->name_mfinante,
             'caen' => $this->caen->principal_mfinante?->code,
-            'registration_date' => $this->registrationDate()?->format('Y-m-d'),
+            'registration_date' => \Valsis\RoCompanyLookup\Support\DateHelper::formatOutputDate(
+                $this->registrationDate()
+            ),
             'vat_payer' => $this->isVatPayer(),
         ];
     }
