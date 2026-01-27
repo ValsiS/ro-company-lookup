@@ -20,4 +20,9 @@ class CacheKey
     {
         return sprintf('%s:%s:circuit', $prefix, $driver);
     }
+
+    public static function forThrottle(string $prefix, string $driver, int $cui, string $date): string
+    {
+        return sprintf('%s:%s:%s:%s:throttle', $prefix, $driver, $cui, $date);
+    }
 }

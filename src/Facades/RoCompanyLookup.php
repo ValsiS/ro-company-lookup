@@ -18,6 +18,8 @@ use Illuminate\Support\Facades\Facade;
  * @method static array<int, array<string, mixed>> batchSummaryWithStatus(array<int, int|string> $cuis, ?\DateTimeInterface $date = null)
  * @method static bool exists(int|string $cui, ?\DateTimeInterface $date = null)
  * @method static bool isValidCui(int|string $cui)
+ * @method static array<string, mixed> summarySafe(int|string $cui, ?\DateTimeInterface $date = null)
+ * @method static array<int|string, array<string, mixed>> batchSummaryMap(array<int, int|string> $cuis, ?\DateTimeInterface $date = null)
  * @method static int normalizeCui(int|string $cui)
  * @method static \Valsis\RoCompanyLookup\Batch\BatchLookup batch(array<int, int|string> $cuis, ?\DateTimeInterface $date = null)
  * @method static \Valsis\RoCompanyLookup\RoCompanyLookupManager driver(string|null $name = null)

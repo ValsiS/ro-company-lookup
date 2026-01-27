@@ -260,6 +260,8 @@ $summaries = RoCompanyLookup::batchSummary(['RO1', 'RO2', 'RO3']);
 $summaryWithStatus = RoCompanyLookup::summaryOrResult('RO123456');
 $summariesWithStatus = RoCompanyLookup::batchSummaryWithStatus(['RO1', 'RO2']);
 $isValid = RoCompanyLookup::isValidCui('RO123456');
+$summarySafe = RoCompanyLookup::summarySafe('RO123456'); // returns ['exists' => false] if not found
+$summaryMap = RoCompanyLookup::batchSummaryMap(['RO1', 'RO2']);
 ```
 
 ## Artisan command

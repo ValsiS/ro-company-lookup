@@ -28,6 +28,7 @@ All configuration lives in `config/ro-company-lookup.php`.
 - `use_locks`: enable cache lock single-flight
 - `lock_seconds`: lock TTL
 - `lock_wait_seconds`: how long to wait for a lock
+- `throttle_seconds`: optional per-CUI throttle window (seconds)
 
 ## Batch
 

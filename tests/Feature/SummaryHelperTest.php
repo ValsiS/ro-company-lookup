@@ -85,6 +85,31 @@ class SummaryHelperTest extends TestCase
         $this->assertFalse(RoCompanyLookup::isValidCui('RO'));
     }
 
+    #[Test]
+    public function it_returns_safe_summary(): void
+    {
+        Http::fake([
+            'webservicesp.anaf.ro/*' => Http::response($this->fixture('anaf_empty.json'), 200),
+        ]);
+
+        $summary = RoCompanyLookup::summarySafe('999999');
+
+        $this->assertSame(['exists' => false], $summary);
+    }
+
+    #[Test]
+    public function it_returns_batch_summary_map(): void
+    {
+        Http::fake([
+            'webservicesp.anaf.ro/*' => Http::response($this->fixture('anaf_batch.json'), 200),
+        ]);
+
+        $summaries = RoCompanyLookup::batchSummaryMap(['RO123', 'RO456']);
+
+        $this->assertSame(123, $summaries['RO123']['cui']);
+        $this->assertSame(456, $summaries['RO456']['cui']);
+    }
+
     /**
      * @return array<string, mixed>
      */

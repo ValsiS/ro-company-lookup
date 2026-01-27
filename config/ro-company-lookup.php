@@ -25,6 +25,7 @@ return [
     'use_locks' => true,
     'lock_seconds' => 10,
     'lock_wait_seconds' => 5,
+    'throttle_seconds' => 0,
 
     'batch_max_size' => 100,
     'batch_chunk_size' => 100,

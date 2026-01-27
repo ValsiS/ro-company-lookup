@@ -51,9 +51,11 @@ class RoCompanyLookupManager extends Manager
         $cacheKey = CacheKey::forLookup($cachePrefix, $driverName, $normalizedCui, $dateString);
         $lockKey = CacheKey::forLock($cachePrefix, $driverName, $normalizedCui, $dateString);
         $circuitKey = CacheKey::forCircuit($cachePrefix, $driverName);
+        $throttleKey = CacheKey::forThrottle($cachePrefix, $driverName, $normalizedCui, $dateString);
         $cacheTtl = (int) config('ro-company-lookup.cache_ttl_seconds', 86400);
         $staleTtl = (int) config('ro-company-lookup.stale_ttl_seconds', 0);
         $useLocks = (bool) config('ro-company-lookup.use_locks', true);
+        $throttleSeconds = (int) config('ro-company-lookup.throttle_seconds', 0);
 
         $cachedEntry = $cache->get($cacheKey);
         if (is_array($cachedEntry)) {
@@ -74,7 +76,9 @@ class RoCompanyLookupManager extends Manager
             $staleTtl,
             $includeRaw,
             $cachedEntry,
-            $circuitKey
+            $circuitKey,
+            $throttleKey,
+            $throttleSeconds
         ) {
             $cachedEntry = $cache->get($cacheKey);
             if (is_array($cachedEntry)) {
@@ -99,6 +103,18 @@ class RoCompanyLookupManager extends Manager
                 }
 
                 throw new CircuitOpenException('Service temporarily unavailable (circuit open).', 503);
+            }
+
+            if ($throttleSeconds > 0) {
+                $lastSeen = $cache->get($throttleKey);
+                if (is_int($lastSeen)) {
+                    $diff = DateHelper::now()->getTimestamp() - $lastSeen;
+                    if ($diff < $throttleSeconds) {
+                        throw new LookupFailedException('Request throttled. Try again later.', 429);
+                    }
+                }
+
+                $cache->put($throttleKey, DateHelper::now()->getTimestamp(), $throttleSeconds);
             }
 
             $startedAt = microtime(true);
@@ -273,6 +289,19 @@ class RoCompanyLookupManager extends Manager
     }
 
     /**
+     * @return array<string, mixed>
+     */
+    public function summarySafe(int|string $cui, ?DateTimeInterface $date = null): array
+    {
+        $result = $this->tryLookup($cui, $date);
+        if (! $result->exists()) {
+            return ['exists' => false];
+        }
+
+        return $result->summary();
+    }
+
+    /**
      * @param  array<int, int|string>  $cuis
      * @return array<int, array<string, mixed>>
      */
@@ -289,6 +318,23 @@ class RoCompanyLookupManager extends Manager
                 'error' => $result->error,
                 'code' => $result->error_code,
             ]);
+        }
+
+        return $summaries;
+    }
+
+    /**
+     * @param  array<int, int|string>  $cuis
+     * @return array<int|string, array<string, mixed>>
+     */
+    public function batchSummaryMap(array $cuis, ?DateTimeInterface $date = null): array
+    {
+        $results = $this->tryBatchNow($cuis, $date);
+        $summaries = [];
+
+        foreach ($results as $index => $result) {
+            $key = $cuis[$index] ?? $index;
+            $summaries[$key] = $result->summary();
         }
 
         return $summaries;

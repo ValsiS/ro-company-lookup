@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Added schema audit snapshots for unknown payload keys.
 - Added summary helpers and batch summary utilities.
 - Added summary helpers with status and CUI validation utility.
+- Added safe summary, keyed batch summaries, and optional per-CUI throttle guard.
 
 ## [0.1.9] - 2026-01-27
 
