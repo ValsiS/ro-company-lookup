@@ -256,9 +256,58 @@ class RoCompanyLookupManager extends Manager
         return $summaries;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
+    public function summaryOrResult(int|string $cui, ?DateTimeInterface $date = null): array
+    {
+        $result = $this->tryLookup($cui, $date);
+        $payload = $result->summary();
+
+        return array_merge($payload, [
+            'status' => $result->status,
+            'message' => $result->message,
+            'error' => $result->error,
+            'code' => $result->error_code,
+        ]);
+    }
+
+    /**
+     * @param  array<int, int|string>  $cuis
+     * @return array<int, array<string, mixed>>
+     */
+    public function batchSummaryWithStatus(array $cuis, ?DateTimeInterface $date = null): array
+    {
+        $results = $this->tryBatchNow($cuis, $date);
+        $summaries = [];
+
+        foreach ($results as $index => $result) {
+            $summary = $result->summary();
+            $summaries[$index] = array_merge($summary, [
+                'status' => $result->status,
+                'message' => $result->message,
+                'error' => $result->error,
+                'code' => $result->error_code,
+            ]);
+        }
+
+        return $summaries;
+    }
+
     public function exists(int|string $cui, ?DateTimeInterface $date = null): bool
     {
         return $this->tryLookup($cui, $date)->exists();
+    }
+
+    public function isValidCui(int|string $cui): bool
+    {
+        try {
+            NormalizeCui::normalize($cui);
+        } catch (InvalidCuiException $exception) {
+            return false;
+        }
+
+        return true;
     }
 
     public function normalizeCui(int|string $cui): int

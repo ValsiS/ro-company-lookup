@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Added compact demo command and convenience helpers (VAT payer, registration date).
 - Added schema audit snapshots for unknown payload keys.
 - Added summary helpers and batch summary utilities.
+- Added summary helpers with status and CUI validation utility.
 
 ## [0.1.9] - 2026-01-27
 

@@ -257,6 +257,9 @@ Additional helpers:
 $summary = RoCompanyLookup::summaryOrNull('RO123456'); // null if not found
 $summary = RoCompanyLookup::summaryOrFail('RO123456'); // throws on invalid / not found
 $summaries = RoCompanyLookup::batchSummary(['RO1', 'RO2', 'RO3']);
+$summaryWithStatus = RoCompanyLookup::summaryOrResult('RO123456');
+$summariesWithStatus = RoCompanyLookup::batchSummaryWithStatus(['RO1', 'RO2']);
+$isValid = RoCompanyLookup::isValidCui('RO123456');
 ```
 
 ## Artisan command
