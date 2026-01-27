@@ -260,6 +260,62 @@ php artisan ro-company-lookup:check 123456 --date=2024-01-10 --raw
 php artisan ro-company-lookup:demo 123456
 ```
 
+Example output (`ro-company-lookup:check`, fictive data):
+
+```json
+{
+  "adresa": {
+    "anaf": {
+      "formatat": "Str. Exemplu, Nr. 10, Mun. Test, Judet IL",
+      "judet": "IL",
+      "localitate": "Mun. Test",
+      "strada": "Str. Exemplu",
+      "numar": "10",
+      "cod_siruta": "999"
+    },
+    "sediu_social": {
+      "formatat": "Str. Exemplu, Nr. 10, Mun. Test, Judet IL",
+      "judet": "IL",
+      "localitate": "Mun. Test",
+      "strada": "Str. Exemplu",
+      "numar": "10",
+      "cod_siruta": "999"
+    }
+  },
+  "cod_caen": {
+    "principal_mfinante": { "cod": "6201", "label": null, "versiune": null },
+    "principal_recom": { "cod": "6201", "label": null, "versiune": null }
+  },
+  "firma": {
+    "cui": 12345678,
+    "j": "J2018000000001",
+    "nume_mfinante": "EXEMPLU SRL",
+    "nume_recom": "EXEMPLU SRL",
+    "profil": {
+      "data_inregistrare": "01.01.2020",
+      "stare_inregistrare": "INREGISTRAT din data 01.01.2020"
+    }
+  },
+  "statut_tva": {
+    "curent": { "cod": 1, "label": "Neplătitor TVA", "data_inceput_tva": null }
+  },
+  "meta": { "sursa": "anaf", "data_interogare": "01.02.2026", "data_ceruta": "2026-02-01" }
+}
+```
+
+Example output (`ro-company-lookup:demo`, fictive data):
+
+```json
+{
+  "exists": true,
+  "cui": 12345678,
+  "name": "EXEMPLU SRL",
+  "caen": "6201",
+  "registration_date": "2020-01-01",
+  "vat_payer": false
+}
+```
+
 ## Schema audit
 
 Enable unknown-key detection and optional snapshots:
