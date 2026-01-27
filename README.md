@@ -243,6 +243,22 @@ try {
 
 For user-facing flows, consider `tryLookup()` which returns a `LookupResultData` with `status` values of `ok`, `not_found`, `invalid`, or `error`.
 
+For a compact summary payload, you can use the helpers:
+
+```php
+$summary = RoCompanyLookup::summary('RO123456');
+// or
+$summary = RoCompanyLookup::trySummary('RO123456')->summary();
+```
+
+Additional helpers:
+
+```php
+$summary = RoCompanyLookup::summaryOrNull('RO123456'); // null if not found
+$summary = RoCompanyLookup::summaryOrFail('RO123456'); // throws on invalid / not found
+$summaries = RoCompanyLookup::batchSummary(['RO1', 'RO2', 'RO3']);
+```
+
 ## Artisan command
 
 ```bash

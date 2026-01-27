@@ -58,4 +58,22 @@ class LookupResultData extends Data
     {
         return $this->status === self::STATUS_OK;
     }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function summary(): array
+    {
+        if ($this->data !== null) {
+            return $this->data->summary();
+        }
+
+        return [
+            'exists' => false,
+            'status' => $this->status,
+            'message' => $this->message,
+            'error' => $this->error,
+            'code' => $this->error_code,
+        ];
+    }
 }

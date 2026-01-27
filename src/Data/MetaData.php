@@ -16,6 +16,7 @@ class MetaData extends Data
 {
     /**
      * @param  array<string, mixed>|Optional  $raw
+     * @param  array<string, mixed>|Optional  $summary
      */
     public function __construct(
         public string $source,
@@ -23,7 +24,8 @@ class MetaData extends Data
         public string $queried_for_date,
         public bool $is_stale,
         public bool $cache_hit,
-        public array|Optional $raw = new Optional
+        public array|Optional $raw = new Optional,
+        public array|Optional $summary = new Optional
     ) {}
 
     public static function blank(): self
@@ -34,7 +36,8 @@ class MetaData extends Data
             queried_for_date: '',
             is_stale: false,
             cache_hit: false,
-            raw: new Optional
+            raw: new Optional,
+            summary: new Optional
         );
     }
 }

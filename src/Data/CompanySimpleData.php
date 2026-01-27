@@ -30,4 +30,26 @@ class CompanySimpleData extends Data
     {
         return $this->company->profile?->registration_date;
     }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function summary(): array
+    {
+        return [
+            'exists' => true,
+            'cui' => $this->company->cui,
+            'name' => $this->company->name_mfinante,
+            'caen' => $this->caen->principal_mfinante?->code,
+            'registration_date' => $this->registrationDate()?->format('Y-m-d'),
+            'vat_payer' => $this->isVatPayer(),
+        ];
+    }
+
+    public function withSummary(): self
+    {
+        $this->meta->summary = $this->summary();
+
+        return $this;
+    }
 }

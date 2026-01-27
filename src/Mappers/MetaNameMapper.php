@@ -13,6 +13,7 @@ final class MetaNameMapper extends AbstractLanguageNameMapper
         'is_stale' => 'este_stale',
         'cache_hit' => 'cache_hit',
         'raw' => 'raw',
+        'summary' => 'rezumat',
     ];
 
     protected array $en = [
@@ -22,5 +23,6 @@ final class MetaNameMapper extends AbstractLanguageNameMapper
         'is_stale' => 'is_stale',
         'cache_hit' => 'cache_hit',
         'raw' => 'raw',
+        'summary' => 'summary',
     ];
 }

@@ -200,6 +200,73 @@ class RoCompanyLookupManager extends Manager
     }
 
     /**
+     * @return array<string, mixed>
+     */
+    public function summary(int|string $cui, ?DateTimeInterface $date = null): array
+    {
+        $data = $this->lookup($cui, $date);
+
+        return $data->summary();
+    }
+
+    public function trySummary(int|string $cui, ?DateTimeInterface $date = null): LookupResultData
+    {
+        return $this->tryLookup($cui, $date);
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    public function summaryOrNull(int|string $cui, ?DateTimeInterface $date = null): ?array
+    {
+        $result = $this->tryLookup($cui, $date);
+        if (! $result->exists()) {
+            return null;
+        }
+
+        return $result->summary();
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function summaryOrFail(int|string $cui, ?DateTimeInterface $date = null): array
+    {
+        $result = $this->tryLookup($cui, $date);
+        if (! $result->exists()) {
+            throw new LookupFailedException($result->message ?? 'Company not found.');
+        }
+
+        return $result->summary();
+    }
+
+    /**
+     * @param  array<int, int|string>  $cuis
+     * @return array<int, array<string, mixed>>
+     */
+    public function batchSummary(array $cuis, ?DateTimeInterface $date = null): array
+    {
+        $results = $this->tryBatchNow($cuis, $date);
+        $summaries = [];
+
+        foreach ($results as $index => $result) {
+            $summaries[$index] = $result->summary();
+        }
+
+        return $summaries;
+    }
+
+    public function exists(int|string $cui, ?DateTimeInterface $date = null): bool
+    {
+        return $this->tryLookup($cui, $date)->exists();
+    }
+
+    public function normalizeCui(int|string $cui): int
+    {
+        return NormalizeCui::normalize($cui);
+    }
+
+    /**
      * @param  array<int, int|string>  $cuis
      */
     public function batch(array $cuis, ?DateTimeInterface $date = null): BatchLookup
