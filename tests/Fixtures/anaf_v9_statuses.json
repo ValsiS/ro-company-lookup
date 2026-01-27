@@ -1,0 +1,33 @@
+{
+  "found": [
+    {
+      "date_generale": {
+        "data": "2026-01-27",
+        "cui": 555111,
+        "denumire": "STATUS SRL",
+        "nrRegCom": "J2022000011111",
+        "cod_CAEN": "6201"
+      },
+      "inregistrare_RTVAI": {
+        "dataActualizareTvaInc": "2024-01-10",
+        "dataPublicareTvaInc": "2024-01-11",
+        "dataInceputTvaInc": "2024-02-01",
+        "dataSfarsitTvaInc": "",
+        "tipActTvaInc": "Decizie",
+        "statusTvaIncasare": true
+      },
+      "stare_inactiv": {
+        "dataInactivare": "2023-06-01",
+        "dataReactivare": "2023-07-01",
+        "dataPublicare": "2023-06-05",
+        "dataRadiere": "",
+        "statusInactivi": false
+      },
+      "inregistrare_SplitTVA": {
+        "statusSplitTVA": false,
+        "dataInceputSplitTVA": "",
+        "dataAnulareSplitTVA": "2019-02-01"
+      }
+    }
+  ]
+}

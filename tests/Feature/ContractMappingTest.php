@@ -74,6 +74,28 @@ class ContractMappingTest extends TestCase
         $this->assertSame('2022-08-11', $result->company->profile->registration_date?->format('Y-m-d'));
     }
 
+    #[Test]
+    public function it_maps_status_sections_from_v9_payload(): void
+    {
+        Http::fake([
+            'webservicesp.anaf.ro/*' => Http::response($this->fixture('anaf_v9_statuses.json'), 200),
+        ]);
+
+        $result = RoCompanyLookup::lookup('RO555111');
+
+        $this->assertNotNull($result->vat_collection);
+        $this->assertTrue($result->vat_collection->enabled);
+        $this->assertSame('2024-02-01', $result->vat_collection->start_date?->format('Y-m-d'));
+
+        $this->assertNotNull($result->inactive_status);
+        $this->assertFalse($result->inactive_status->is_inactive);
+        $this->assertSame('2023-06-01', $result->inactive_status->inactivated_at?->format('Y-m-d'));
+
+        $this->assertNotNull($result->split_vat);
+        $this->assertFalse($result->split_vat->enabled);
+        $this->assertSame('2019-02-01', $result->split_vat->cancelled_at?->format('Y-m-d'));
+    }
+
     /**
      * @return array<string, mixed>
      */

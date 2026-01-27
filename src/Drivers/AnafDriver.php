@@ -22,9 +22,12 @@ use Valsis\RoCompanyLookup\Data\CompanyProfileData;
 use Valsis\RoCompanyLookup\Data\CompanySimpleData;
 use Valsis\RoCompanyLookup\Data\ContactData;
 use Valsis\RoCompanyLookup\Data\FirmaData;
+use Valsis\RoCompanyLookup\Data\InactiveStatusData;
 use Valsis\RoCompanyLookup\Data\LegalData;
 use Valsis\RoCompanyLookup\Data\LegalHistoryEntryData;
 use Valsis\RoCompanyLookup\Data\MetaData;
+use Valsis\RoCompanyLookup\Data\SplitVatData;
+use Valsis\RoCompanyLookup\Data\VatCollectionData;
 use Valsis\RoCompanyLookup\Data\VatStatusData;
 use Valsis\RoCompanyLookup\Data\VatStatusEntryData;
 use Valsis\RoCompanyLookup\Exceptions\LookupFailedException;
@@ -255,6 +258,9 @@ class AnafDriver implements RoCompanyLookupDriver
             ?? Arr::get($entry, 'inregistrare_scop_Tva');
         $queriedAt = DateHelper::parseDate($this->firstValue($general ?? $entry, ['data', 'data_interogare']));
         $this->auditEntry($entry, $cui, $queriedAt);
+        $vatCollection = $this->mapVatCollection(Arr::get($entry, 'inregistrare_RTVAI'));
+        $inactiveStatus = $this->mapInactiveStatus(Arr::get($entry, 'stare_inactiv'));
+        $splitVat = $this->mapSplitVat(Arr::get($entry, 'inregistrare_SplitTVA'));
         $vat = $this->mapVat($vatData, $queriedAt);
 
         $domiciliuRaw = Arr::get($entry, 'domiciliu_fiscal')
@@ -278,6 +284,9 @@ class AnafDriver implements RoCompanyLookupDriver
             caen: $caenSet,
             contact: $contact,
             company: $company,
+            vat_collection: $vatCollection,
+            inactive_status: $inactiveStatus,
+            split_vat: $splitVat,
             legal: $legal,
             vat: $vat,
             meta: MetaData::blank()
@@ -1005,6 +1014,79 @@ class AnafDriver implements RoCompanyLookupDriver
         );
     }
 
+    protected function mapVatCollection(mixed $data): ?VatCollectionData
+    {
+        if (! is_array($data)) {
+            return null;
+        }
+
+        $enabled = $this->normalizeBool($data['statusTvaIncasare'] ?? null);
+        $startDate = DateHelper::parseDate($this->firstValue($data, ['dataInceputTvaInc']));
+        $endDate = DateHelper::parseDate($this->firstValue($data, ['dataSfarsitTvaInc']));
+        $publishedAt = DateHelper::parseDate($this->firstValue($data, ['dataPublicareTvaInc']));
+        $updatedAt = DateHelper::parseDate($this->firstValue($data, ['dataActualizareTvaInc']));
+        $actType = $this->firstValue($data, ['tipActTvaInc']);
+
+        if ($enabled === null && $startDate === null && $endDate === null && $publishedAt === null && $updatedAt === null && $actType === null) {
+            return null;
+        }
+
+        return new VatCollectionData(
+            enabled: $enabled,
+            start_date: $startDate,
+            end_date: $endDate,
+            published_at: $publishedAt,
+            updated_at: $updatedAt,
+            act_type: $actType
+        );
+    }
+
+    protected function mapInactiveStatus(mixed $data): ?InactiveStatusData
+    {
+        if (! is_array($data)) {
+            return null;
+        }
+
+        $status = $this->normalizeBool($data['statusInactivi'] ?? null);
+        $inactivatedAt = DateHelper::parseDate($this->firstValue($data, ['dataInactivare']));
+        $reactivatedAt = DateHelper::parseDate($this->firstValue($data, ['dataReactivare']));
+        $publishedAt = DateHelper::parseDate($this->firstValue($data, ['dataPublicare']));
+        $removedAt = DateHelper::parseDate($this->firstValue($data, ['dataRadiere']));
+
+        if ($status === null && $inactivatedAt === null && $reactivatedAt === null && $publishedAt === null && $removedAt === null) {
+            return null;
+        }
+
+        return new InactiveStatusData(
+            is_inactive: $status,
+            inactivated_at: $inactivatedAt,
+            reactivated_at: $reactivatedAt,
+            published_at: $publishedAt,
+            removed_at: $removedAt
+        );
+    }
+
+    protected function mapSplitVat(mixed $data): ?SplitVatData
+    {
+        if (! is_array($data)) {
+            return null;
+        }
+
+        $enabled = $this->normalizeBool($data['statusSplitTVA'] ?? null);
+        $startDate = DateHelper::parseDate($this->firstValue($data, ['dataInceputSplitTVA']));
+        $cancelledAt = DateHelper::parseDate($this->firstValue($data, ['dataAnulareSplitTVA']));
+
+        if ($enabled === null && $startDate === null && $cancelledAt === null) {
+            return null;
+        }
+
+        return new SplitVatData(
+            enabled: $enabled,
+            start_date: $startDate,
+            cancelled_at: $cancelledAt
+        );
+    }
+
     protected function emptyCompanyData(int $cui): CompanySimpleData
     {
         $emptyCaen = new CaenSetData(null, null);
@@ -1025,6 +1107,9 @@ class AnafDriver implements RoCompanyLookupDriver
             caen: $emptyCaen,
             contact: $emptyContact,
             company: $emptyCompany,
+            vat_collection: null,
+            inactive_status: null,
+            split_vat: null,
             legal: $emptyLegal,
             vat: $emptyVat,
             meta: MetaData::blank()

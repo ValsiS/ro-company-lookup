@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Added safe summary, keyed batch summaries, and optional per-CUI throttle guard.
 - Added configurable output date format for summaries.
 - Added global date formatting with per-language defaults and per-request overrides.
+- Added VAT collection, inactive status, and split VAT mapping.
 
 ## [0.1.9] - 2026-01-27
 

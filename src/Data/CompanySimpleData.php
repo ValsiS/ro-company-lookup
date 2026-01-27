@@ -16,6 +16,9 @@ class CompanySimpleData extends Data
         public CaenSetData $caen,
         public ContactData $contact,
         public FirmaData $company,
+        public ?VatCollectionData $vat_collection,
+        public ?InactiveStatusData $inactive_status,
+        public ?SplitVatData $split_vat,
         public LegalData $legal,
         public VatStatusData $vat,
         public MetaData $meta
