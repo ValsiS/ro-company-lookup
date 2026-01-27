@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-01-27
+
+- Added Laravel Boost v2 MCP documentation with skills overview and local setup workflow.
+
 ## [0.3.0] - 2026-01-27
 
 - Renamed DTO output keys to general, ANAF-aligned naming (removed non-ANAF fields).
