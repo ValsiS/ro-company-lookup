@@ -8,9 +8,9 @@
       "type": "object",
       "properties": {
         "cui": { "type": "integer" },
-        "trade_register_number": { "type": ["string", "null"] },
-        "ministry_of_finance_name": { "type": ["string", "null"] },
-        "recom_name": { "type": ["string", "null"] }
+        "registration_number": { "type": ["string", "null"] },
+        "name": { "type": ["string", "null"] },
+        "profile": { "$ref": "#/definitions/profile" }
       },
       "required": ["cui"],
       "additionalProperties": true
@@ -18,20 +18,13 @@
     "address": {
       "type": "object",
       "properties": {
-        "anaf": { "$ref": "#/definitions/address" },
+        "fiscal_domicile": { "$ref": "#/definitions/address" },
         "registered_office": { "$ref": "#/definitions/address" }
       },
       "additionalProperties": true
     },
-    "caen_code": {
-      "type": "object",
-      "properties": {
-        "primary_ministry_of_finance": { "$ref": "#/definitions/caen" },
-        "primary_recom": { "$ref": "#/definitions/caen" }
-      },
-      "additionalProperties": true
-    },
-    "contact_details": {
+    "caen_code": { "$ref": "#/definitions/caen" },
+    "contact": {
       "type": "object",
       "properties": {
         "phone_numbers": { "type": "array", "items": { "type": "string" } },
@@ -61,6 +54,9 @@
       },
       "additionalProperties": true
     },
+    "vat_collection": { "$ref": "#/definitions/vat_collection" },
+    "inactive_status": { "$ref": "#/definitions/inactive_status" },
+    "split_vat": { "$ref": "#/definitions/split_vat" },
     "meta": {
       "type": "object",
       "properties": {
@@ -79,7 +75,7 @@
     "company",
     "address",
     "caen_code",
-    "contact_details",
+    "contact",
     "legal_form",
     "vat_status",
     "meta"
@@ -100,33 +96,29 @@
       "properties": {
         "formatted_address": { "type": ["string", "null"] },
         "raw_address": { "type": ["string", "null"] },
-        "raw_ministry_of_finance": { "type": ["string", "null"] },
-        "raw_recom": { "type": ["string", "null"] },
         "country": { "type": ["string", "null"] },
         "county": { "type": ["string", "null"] },
+        "county_code": { "type": ["string", "null"] },
+        "county_auto_code": { "type": ["string", "null"] },
         "city": { "type": ["string", "null"] },
-        "sub_locality": { "type": ["string", "null"] },
-        "sector": { "type": ["string", "null"] },
+        "locality_code": { "type": ["string", "null"] },
         "street": { "type": ["string", "null"] },
-        "street_type": { "type": ["string", "null"] },
         "number": { "type": ["string", "null"] },
-        "building": { "type": ["string", "null"] },
-        "entrance": { "type": ["string", "null"] },
-        "floor": { "type": ["string", "null"] },
-        "apartment": { "type": ["string", "null"] },
         "postal_code": { "type": ["string", "null"] },
-        "siruta_code": { "type": ["string", "null"] },
-        "source": { "type": ["string", "null"] },
-        "expiry": { "$ref": "#/definitions/expiry" }
+        "details": { "type": ["string", "null"] }
       },
       "additionalProperties": true
     },
-    "expiry": {
+    "profile": {
       "type": ["object", "null"],
       "properties": {
-        "updated_at": { "type": ["string", "null"] },
-        "expires_at": { "type": ["string", "null"] },
-        "is_expired": { "type": ["boolean", "null"] }
+        "registration_date": { "type": ["string", "null"] },
+        "registration_status": { "type": ["string", "null"] },
+        "fiscal_office": { "type": ["string", "null"] },
+        "ownership_form": { "type": ["string", "null"] },
+        "e_invoice_status": { "type": ["boolean", "null"] },
+        "e_invoice_registration_date": { "type": ["string", "null"] },
+        "iban": { "type": ["string", "null"] }
       },
       "additionalProperties": true
     },
@@ -148,6 +140,38 @@
         "vat_cancellation_date": { "type": ["string", "null"] },
         "vat_cancellation_operation_date": { "type": ["string", "null"] },
         "queried_at": { "type": ["string", "null"] }
+      },
+      "additionalProperties": true
+    },
+    "vat_collection": {
+      "type": ["object", "null"],
+      "properties": {
+        "enabled": { "type": ["boolean", "null"] },
+        "start_date": { "type": ["string", "null"] },
+        "end_date": { "type": ["string", "null"] },
+        "published_at": { "type": ["string", "null"] },
+        "updated_at": { "type": ["string", "null"] },
+        "act_type": { "type": ["string", "null"] }
+      },
+      "additionalProperties": true
+    },
+    "inactive_status": {
+      "type": ["object", "null"],
+      "properties": {
+        "is_inactive": { "type": ["boolean", "null"] },
+        "inactivated_at": { "type": ["string", "null"] },
+        "reactivated_at": { "type": ["string", "null"] },
+        "published_at": { "type": ["string", "null"] },
+        "removed_at": { "type": ["string", "null"] }
+      },
+      "additionalProperties": true
+    },
+    "split_vat": {
+      "type": ["object", "null"],
+      "properties": {
+        "enabled": { "type": ["boolean", "null"] },
+        "start_date": { "type": ["string", "null"] },
+        "cancelled_at": { "type": ["string", "null"] }
       },
       "additionalProperties": true
     }

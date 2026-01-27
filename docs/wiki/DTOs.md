@@ -7,22 +7,18 @@ The package returns `CompanySimpleData` (spatie/laravel-data). Output keys are m
 ```json
 {
   "adresa": {
-    "anaf": { "formatat": "Str. Exemplu, Nr. 10, Mun. Test, Judet IL" },
+    "domiciliu_fiscal": { "formatat": "Str. Exemplu, Nr. 10, Mun. Test, Judet IL" },
     "sediu_social": { "formatat": "Str. Exemplu, Nr. 10, Mun. Test, Judet IL" }
   },
-  "cod_caen": {
-    "principal_mfinante": { "cod": "6201", "label": null },
-    "principal_recom": { "cod": "6201", "label": null, "versiune": null }
-  },
+  "cod_caen": { "cod": "6201", "label": null, "versiune": null },
   "date_contact": {
     "telefon": [],
     "email": []
   },
   "firma": {
     "cui": 12345678,
-    "j": "J2018000000001",
-    "nume_mfinante": "EXEMPLU SRL",
-    "nume_recom": "EXEMPLU SRL",
+    "nr_reg_com": "J2018000000001",
+    "denumire": "EXEMPLU SRL",
     "profil": {
       "data_inregistrare": "01.01.2020",
       "stare_inregistrare": "INREGISTRAT din data 01.01.2020",
@@ -93,22 +89,18 @@ Versioned JSON Schemas are available in:
 ```json
 {
   "address": {
-    "anaf": { "formatted_address": "Str. Exemplu, Nr. 10, Mun. Test, Judet IL" },
+    "fiscal_domicile": { "formatted_address": "Str. Exemplu, Nr. 10, Mun. Test, Judet IL" },
     "registered_office": { "formatted_address": "Str. Exemplu, Nr. 10, Mun. Test, Judet IL" }
   },
-  "caen_code": {
-    "primary_ministry_of_finance": { "code": "6201", "label": null },
-    "primary_recom": { "code": "6201", "label": null, "version": null }
-  },
-  "contact_details": {
+  "caen_code": { "code": "6201", "label": null, "version": null },
+  "contact": {
     "phone_numbers": [],
     "emails": []
   },
   "company": {
     "cui": 12345678,
-    "trade_register_number": "J2018000000001",
-    "ministry_of_finance_name": "EXEMPLU SRL",
-    "recom_name": "EXEMPLU SRL",
+    "registration_number": "J2018000000001",
+    "name": "EXEMPLU SRL",
     "profile": {
       "registration_date": "2020-01-01",
       "registration_status": "INREGISTRAT din data 01.01.2020",
@@ -124,7 +116,7 @@ Versioned JSON Schemas are available in:
     "history": []
   },
   "vat_collection": {
-    "active": false,
+    "enabled": false,
     "start_date": null,
     "end_date": null,
     "published_at": null,
@@ -139,9 +131,9 @@ Versioned JSON Schemas are available in:
     "removed_at": null
   },
   "split_vat": {
-    "active": false,
+    "enabled": false,
     "start_date": null,
-    "cancel_date": null
+    "cancelled_at": null
   },
   "vat_status": {
     "current": { "code": 1, "label": "Neplătitor TVA", "queried_at": "2026-02-01" },

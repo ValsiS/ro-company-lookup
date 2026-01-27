@@ -59,8 +59,8 @@ class DemoCompanyCommand extends Command
         $payload = [
             'exists' => true,
             'cui' => $company?->company->cui,
-            'name' => $company?->company->name_mfinante,
-            'caen' => $company?->caen->principal_mfinante?->code,
+            'name' => $company?->company->name,
+            'caen' => $company?->caen?->code,
             'registration_date' => $company?->registrationDate()?->format('Y-m-d'),
             'vat_payer' => $company?->isVatPayer(),
         ];

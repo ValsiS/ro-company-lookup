@@ -14,10 +14,8 @@ use Illuminate\Support\Facades\Log;
 use Spatie\LaravelData\DataCollection;
 use Valsis\RoCompanyLookup\Contracts\RoCompanyLookupDriver;
 use Valsis\RoCompanyLookup\Data\AddressData;
-use Valsis\RoCompanyLookup\Data\AddressExpirationData;
 use Valsis\RoCompanyLookup\Data\AddressSetData;
 use Valsis\RoCompanyLookup\Data\CaenEntryData;
-use Valsis\RoCompanyLookup\Data\CaenSetData;
 use Valsis\RoCompanyLookup\Data\CompanyProfileData;
 use Valsis\RoCompanyLookup\Data\CompanySimpleData;
 use Valsis\RoCompanyLookup\Data\ContactData;
@@ -220,16 +218,11 @@ class AnafDriver implements RoCompanyLookupDriver
         $company = new FirmaData(
             cui: $cui,
             registration_number: $nrRegCom,
-            name_mfinante: $name,
-            name_recom: $name,
+            name: $name,
             profile: $profile
         );
 
         $caenEntry = $caen ? new CaenEntryData(code: $caen, label: null, version: null) : null;
-        $caenSet = new CaenSetData(
-            principal_mfinante: $caenEntry,
-            principal_recom: $caenEntry
-        );
 
         $contact = new ContactData(
             phones: array_filter([
@@ -254,7 +247,7 @@ class AnafDriver implements RoCompanyLookupDriver
         $sediuRaw = Arr::get($entry, 'adresa_sediu_social');
 
         $addresses = new AddressSetData(
-            anaf: $this->mapAddress($domiciliuRaw),
+            fiscal_domicile: $this->mapAddress($domiciliuRaw),
             registered_office: $this->mapAddress($sediuRaw)
         );
 
@@ -262,7 +255,7 @@ class AnafDriver implements RoCompanyLookupDriver
 
         return new CompanySimpleData(
             address: $addresses,
-            caen: $caenSet,
+            caen: $caenEntry,
             contact: $contact,
             company: $company,
             vat_collection: $vatCollection,
@@ -658,24 +651,16 @@ class AnafDriver implements RoCompanyLookupDriver
                 return new AddressData(
                     formatted: $address,
                     raw: $address,
-                    raw_mf: null,
-                    raw_recom: null,
                     country: null,
                     county: null,
+                    county_code: null,
+                    county_auto_code: null,
                     city: null,
-                    sub_locality: null,
-                    sector: null,
+                    locality_code: null,
                     street: null,
-                    street_type: null,
                     number: null,
-                    building: null,
-                    entrance: null,
-                    floor: null,
-                    apartment: null,
                     postal_code: null,
-                    siruta_code: null,
-                    source: null,
-                    expiration: null
+                    details: null
                 );
             }
 
@@ -683,41 +668,26 @@ class AnafDriver implements RoCompanyLookupDriver
         }
 
         $formatted = $this->firstValue($address, ['adresa']);
-        $raw = null;
-        $rawMf = null;
-        $rawRecom = null;
-        $expiration = $this->mapExpiration($address['expirare'] ?? null);
+        $raw = $this->firstValue($address, ['adresa']);
 
         $country = $this->firstValue($address, ['dtara', 'stara']);
         $county = $this->firstValue($address, ['ddenumire_Judet', 'sdenumire_Judet']);
+        $countyCode = $this->firstValue($address, ['dcod_Judet', 'scod_Judet']);
+        $countyAutoCode = $this->firstValue($address, ['dcod_JudetAuto', 'scod_JudetAuto']);
         $city = $this->firstValue($address, ['ddenumire_Localitate', 'sdenumire_Localitate']);
-        $subLocality = $this->firstValue($address, ['ddetalii_Adresa', 'sdetalii_Adresa']);
-        $sector = null;
+        $localityCode = $this->firstValue($address, ['dcod_Localitate', 'scod_Localitate']);
         $street = $this->firstValue($address, ['ddenumire_Strada', 'sdenumire_Strada']);
-        $streetType = null;
         $number = $this->firstValue($address, ['dnumar_Strada', 'snumar_Strada']);
-        $building = null;
-        $entrance = null;
-        $floor = null;
-        $apartment = null;
         $postalCode = $this->firstValue($address, ['dcod_Postal', 'scod_Postal']);
-        $sirutaCode = $this->firstValue($address, ['dcod_Localitate', 'scod_Localitate']);
-        $source = null;
+        $details = $this->firstValue($address, ['ddetalii_Adresa', 'sdetalii_Adresa']);
 
         if ($formatted === null) {
             $formatted = $this->formatAddressFromParts(
                 country: $country,
                 county: $county,
                 city: $city,
-                subLocality: $subLocality,
-                sector: $sector,
                 street: $street,
-                streetType: $streetType,
                 number: $number,
-                building: $building,
-                entrance: $entrance,
-                floor: $floor,
-                apartment: $apartment,
                 postalCode: $postalCode
             );
         }
@@ -725,24 +695,16 @@ class AnafDriver implements RoCompanyLookupDriver
         return new AddressData(
             formatted: $formatted,
             raw: $raw,
-            raw_mf: $rawMf,
-            raw_recom: $rawRecom,
             country: $country,
             county: $county,
+            county_code: $countyCode,
+            county_auto_code: $countyAutoCode,
             city: $city,
-            sub_locality: $subLocality,
-            sector: $sector,
+            locality_code: $localityCode,
             street: $street,
-            street_type: $streetType,
             number: $number,
-            building: $building,
-            entrance: $entrance,
-            floor: $floor,
-            apartment: $apartment,
             postal_code: $postalCode,
-            siruta_code: $sirutaCode,
-            source: $source,
-            expiration: $expiration
+            details: $details
         );
     }
 
@@ -750,54 +712,22 @@ class AnafDriver implements RoCompanyLookupDriver
         ?string $country,
         ?string $county,
         ?string $city,
-        ?string $subLocality,
-        ?string $sector,
         ?string $street,
-        ?string $streetType,
         ?string $number,
-        ?string $building,
-        ?string $entrance,
-        ?string $floor,
-        ?string $apartment,
         ?string $postalCode
     ): ?string {
         $parts = [];
 
         if ($street !== null) {
-            $streetLabel = $streetType ? trim($streetType.' '.$street) : $street;
-            $parts[] = $streetLabel;
+            $parts[] = $street;
         }
 
         if ($number !== null) {
             $parts[] = 'Nr. '.$number;
         }
 
-        if ($building !== null) {
-            $parts[] = 'Bloc '.$building;
-        }
-
-        if ($entrance !== null) {
-            $parts[] = 'Sc. '.$entrance;
-        }
-
-        if ($floor !== null) {
-            $parts[] = 'Et. '.$floor;
-        }
-
-        if ($apartment !== null) {
-            $parts[] = 'Ap. '.$apartment;
-        }
-
-        if ($sector !== null) {
-            $parts[] = 'Sector '.$sector;
-        }
-
         if ($city !== null) {
             $parts[] = $city;
-        }
-
-        if ($subLocality !== null) {
-            $parts[] = $subLocality;
         }
 
         if ($county !== null) {
@@ -815,19 +745,6 @@ class AnafDriver implements RoCompanyLookupDriver
         $parts = array_values(array_filter($parts, static fn (?string $value) => $value !== null && $value !== ''));
 
         return count($parts) > 0 ? implode(', ', $parts) : null;
-    }
-
-    protected function mapExpiration(mixed $expiration): ?AddressExpirationData
-    {
-        if (! is_array($expiration)) {
-            return null;
-        }
-
-        return new AddressExpirationData(
-            updated_at: DateHelper::parseDate($this->firstValue($expiration, ['data_actualizare', 'updated_at'])),
-            expires_at: DateHelper::parseDate($this->firstValue($expiration, ['data_expirare', 'expires_at'])),
-            is_expired: $this->normalizeBool($this->firstValue($expiration, ['este_expirat', 'is_expired']))
-        );
     }
 
     protected function mapVatCollection(mixed $data): ?VatCollectionData
@@ -905,9 +822,9 @@ class AnafDriver implements RoCompanyLookupDriver
 
     protected function emptyCompanyData(int $cui): CompanySimpleData
     {
-        $emptyCaen = new CaenSetData(null, null);
+        $emptyCaen = null;
         $emptyContact = new ContactData([], []);
-        $emptyCompany = new FirmaData($cui, null, null, null);
+        $emptyCompany = new FirmaData($cui, null, null);
         $emptyLegal = new LegalData(
             current: null,
             history: new DataCollection(LegalHistoryEntryData::class, [])

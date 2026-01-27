@@ -22,7 +22,7 @@ final class CompanySimpleNameMapper extends AbstractLanguageNameMapper
     protected array $en = [
         'address' => 'address',
         'caen' => 'caen_code',
-        'contact' => 'contact_details',
+        'contact' => 'contact',
         'company' => 'company',
         'vat_collection' => 'vat_collection',
         'inactive_status' => 'inactive_status',

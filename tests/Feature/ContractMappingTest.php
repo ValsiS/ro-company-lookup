@@ -21,7 +21,7 @@ class ContractMappingTest extends TestCase
         $result = RoCompanyLookup::lookup('999999');
 
         $this->assertSame(999999, $result->company->cui);
-        $this->assertNull($result->company->name_mfinante);
+        $this->assertNull($result->company->name);
     }
 
     #[Test]
@@ -34,7 +34,7 @@ class ContractMappingTest extends TestCase
         $result = RoCompanyLookup::lookup('RO46632129');
 
         $this->assertSame(46632129, $result->company->cui);
-        $this->assertSame('TERRADOT S.R.L.', $result->company->name_mfinante);
+        $this->assertSame('TERRADOT S.R.L.', $result->company->name);
         $this->assertNotNull($result->company->profile);
         $this->assertSame('INREGISTRAT din data 10.08.2022', $result->company->profile->registration_status);
         $this->assertSame('2022-08-11', $result->company->profile->registration_date?->format('Y-m-d'));

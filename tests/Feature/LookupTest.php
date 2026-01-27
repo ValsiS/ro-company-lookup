@@ -31,12 +31,12 @@ class LookupTest extends TestCase
         $result = RoCompanyLookup::lookup('RO123456', $date);
 
         $this->assertSame(123456, $result->company->cui);
-        $this->assertSame('ACME SRL', $result->company->name_mfinante);
+        $this->assertSame('ACME SRL', $result->company->name);
         $this->assertSame('J40/123/2010', $result->company->registration_number);
-        $this->assertSame('6201', $result->caen->principal_mfinante?->code);
+        $this->assertSame('6201', $result->caen?->code);
         $this->assertSame('0211234567', $result->contact->phones[0] ?? null);
         $this->assertSame(2, $result->vat->current?->code);
-        $this->assertSame('Bucuresti', $result->address->anaf?->county);
+        $this->assertSame('Bucuresti', $result->address->fiscal_domicile?->county);
         $this->assertSame('2024-01-10', $result->meta->queried_for_date);
         $this->assertSame('anaf', $result->meta->source);
         $this->assertFalse($result->meta->cache_hit);
@@ -56,8 +56,8 @@ class LookupTest extends TestCase
         $results = RoCompanyLookup::batch([123, 456])->get();
 
         $this->assertCount(2, $results);
-        $this->assertSame('ACME SRL', $results[0]->company->name_mfinante);
-        $this->assertSame('BETA SRL', $results[1]->company->name_mfinante);
+        $this->assertSame('ACME SRL', $results[0]->company->name);
+        $this->assertSame('BETA SRL', $results[1]->company->name);
     }
 
     #[Test]
@@ -112,7 +112,7 @@ class LookupTest extends TestCase
 
         $this->assertTrue($result->meta->is_stale);
         $this->assertTrue($result->meta->cache_hit);
-        $this->assertSame('ACME SRL', $result->company->name_mfinante);
+        $this->assertSame('ACME SRL', $result->company->name);
     }
 
     #[Test]
@@ -129,7 +129,7 @@ class LookupTest extends TestCase
 
         $result = RoCompanyLookup::lookup('RO123456', $date);
 
-        $this->assertSame('ACME SRL', $result->company->name_mfinante);
+        $this->assertSame('ACME SRL', $result->company->name);
         Http::assertSentCount(2);
     }
 

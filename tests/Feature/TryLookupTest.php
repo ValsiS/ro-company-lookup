@@ -45,7 +45,7 @@ class TryLookupTest extends TestCase
 
         $this->assertSame('ok', $result->status);
         $this->assertNotNull($result->data);
-        $this->assertSame('ACME SRL', $result->data->company->name_mfinante);
+        $this->assertSame('ACME SRL', $result->data->company->name);
     }
 
     /**

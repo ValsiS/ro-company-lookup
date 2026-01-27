@@ -217,9 +217,8 @@ Company profile (`company.profile`) includes:
 {
   "firma": {
     "cui": 12345678,
-    "j": "J2018000000001",
-    "nume_mfinante": "EXEMPLU SRL",
-    "nume_recom": "EXEMPLU SRL",
+    "nr_reg_com": "J2018000000001",
+    "denumire": "EXEMPLU SRL",
     "profil": {
       "data_inregistrare": "01.01.2020",
       "stare_inregistrare": "INREGISTRAT din data 01.01.2020"
@@ -267,32 +266,36 @@ Example output (`ro-company-lookup:check`, fictive data):
 ```json
 {
   "adresa": {
-    "anaf": {
+    "domiciliu_fiscal": {
       "formatat": "Str. Exemplu, Nr. 10, Mun. Test, Judet IL",
       "judet": "IL",
+      "cod_judet": "01",
+      "cod_judet_auto": "IL",
       "localitate": "Mun. Test",
+      "cod_localitate": "999",
       "strada": "Str. Exemplu",
       "numar": "10",
-      "cod_siruta": "999"
+      "cod_postal": "010101",
+      "detalii": null
     },
     "sediu_social": {
       "formatat": "Str. Exemplu, Nr. 10, Mun. Test, Judet IL",
       "judet": "IL",
+      "cod_judet": "01",
+      "cod_judet_auto": "IL",
       "localitate": "Mun. Test",
+      "cod_localitate": "999",
       "strada": "Str. Exemplu",
       "numar": "10",
-      "cod_siruta": "999"
+      "cod_postal": "010101",
+      "detalii": null
     }
   },
-  "cod_caen": {
-    "principal_mfinante": { "cod": "6201", "label": null, "versiune": null },
-    "principal_recom": { "cod": "6201", "label": null, "versiune": null }
-  },
+  "cod_caen": { "cod": "6201", "label": null, "versiune": null },
   "firma": {
     "cui": 12345678,
-    "j": "J2018000000001",
-    "nume_mfinante": "EXEMPLU SRL",
-    "nume_recom": "EXEMPLU SRL",
+    "nr_reg_com": "J2018000000001",
+    "denumire": "EXEMPLU SRL",
     "profil": {
       "data_inregistrare": "01.01.2020",
       "stare_inregistrare": "INREGISTRAT din data 01.01.2020"

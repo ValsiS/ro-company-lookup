@@ -12,7 +12,7 @@ use Valsis\RoCompanyLookup\Mappers\AddressSetNameMapper;
 class AddressSetData extends Data
 {
     public function __construct(
-        public ?AddressData $anaf,
+        public ?AddressData $fiscal_domicile,
         public ?AddressData $registered_office
     ) {}
 }

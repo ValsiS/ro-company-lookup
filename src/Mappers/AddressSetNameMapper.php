@@ -7,12 +7,12 @@ namespace Valsis\RoCompanyLookup\Mappers;
 final class AddressSetNameMapper extends AbstractLanguageNameMapper
 {
     protected array $ro = [
-        'anaf' => 'anaf',
+        'fiscal_domicile' => 'domiciliu_fiscal',
         'registered_office' => 'sediu_social',
     ];
 
     protected array $en = [
-        'anaf' => 'anaf',
+        'fiscal_domicile' => 'fiscal_domicile',
         'registered_office' => 'registered_office',
     ];
 }

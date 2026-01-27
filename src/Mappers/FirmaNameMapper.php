@@ -8,17 +8,15 @@ final class FirmaNameMapper extends AbstractLanguageNameMapper
 {
     protected array $ro = [
         'cui' => 'cui',
-        'registration_number' => 'j',
-        'name_mfinante' => 'nume_mfinante',
-        'name_recom' => 'nume_recom',
+        'registration_number' => 'nr_reg_com',
+        'name' => 'denumire',
         'profile' => 'profil',
     ];
 
     protected array $en = [
         'cui' => 'cui',
-        'registration_number' => 'trade_register_number',
-        'name_mfinante' => 'ministry_of_finance_name',
-        'name_recom' => 'recom_name',
+        'registration_number' => 'registration_number',
+        'name' => 'name',
         'profile' => 'profile',
     ];
 }

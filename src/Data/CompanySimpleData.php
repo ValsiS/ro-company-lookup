@@ -13,7 +13,7 @@ class CompanySimpleData extends Data
 {
     public function __construct(
         public AddressSetData $address,
-        public CaenSetData $caen,
+        public ?CaenEntryData $caen,
         public ContactData $contact,
         public FirmaData $company,
         public ?VatCollectionData $vat_collection,
@@ -42,8 +42,8 @@ class CompanySimpleData extends Data
         return [
             'exists' => true,
             'cui' => $this->company->cui,
-            'name' => $this->company->name_mfinante,
-            'caen' => $this->caen->principal_mfinante?->code,
+            'name' => $this->company->name,
+            'caen' => $this->caen?->code,
             'registration_date' => \Valsis\RoCompanyLookup\Support\DateHelper::formatOutputDate(
                 $this->registrationDate()
             ),

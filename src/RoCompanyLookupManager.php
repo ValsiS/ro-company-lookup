@@ -616,10 +616,10 @@ class RoCompanyLookupManager extends Manager
 
     protected function isNotFound(CompanySimpleData $data): bool
     {
-        return $data->company->name_mfinante === null
+        return $data->company->name === null
             && $data->company->registration_number === null
-            && $data->caen->principal_mfinante === null
-            && $data->address->anaf === null
+            && $data->caen === null
+            && $data->address->fiscal_domicile === null
             && $data->address->registered_office === null
             && $data->vat->current === null
             && $data->legal->current === null;

@@ -14,8 +14,7 @@ class FirmaData extends Data
     public function __construct(
         public int $cui,
         public ?string $registration_number,
-        public ?string $name_mfinante,
-        public ?string $name_recom,
+        public ?string $name,
         public ?CompanyProfileData $profile = null
     ) {}
 }

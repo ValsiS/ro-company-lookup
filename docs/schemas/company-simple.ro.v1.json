@@ -8,9 +8,9 @@
       "type": "object",
       "properties": {
         "cui": { "type": "integer" },
-        "j": { "type": ["string", "null"] },
-        "nume_mfinante": { "type": ["string", "null"] },
-        "nume_recom": { "type": ["string", "null"] }
+        "nr_reg_com": { "type": ["string", "null"] },
+        "denumire": { "type": ["string", "null"] },
+        "profil": { "$ref": "#/definitions/profil" }
       },
       "required": ["cui"],
       "additionalProperties": true
@@ -18,19 +18,12 @@
     "adresa": {
       "type": "object",
       "properties": {
-        "anaf": { "$ref": "#/definitions/adresa" },
+        "domiciliu_fiscal": { "$ref": "#/definitions/adresa" },
         "sediu_social": { "$ref": "#/definitions/adresa" }
       },
       "additionalProperties": true
     },
-    "cod_caen": {
-      "type": "object",
-      "properties": {
-        "principal_mfinante": { "$ref": "#/definitions/caen" },
-        "principal_recom": { "$ref": "#/definitions/caen" }
-      },
-      "additionalProperties": true
-    },
+    "cod_caen": { "$ref": "#/definitions/caen" },
     "date_contact": {
       "type": "object",
       "properties": {
@@ -61,6 +54,9 @@
       },
       "additionalProperties": true
     },
+    "tva_incasare": { "$ref": "#/definitions/tva_incasare" },
+    "stare_inactiv": { "$ref": "#/definitions/stare_inactiv" },
+    "split_tva": { "$ref": "#/definitions/split_tva" },
     "meta": {
       "type": "object",
       "properties": {
@@ -100,33 +96,29 @@
       "properties": {
         "formatat": { "type": ["string", "null"] },
         "neprelucrat": { "type": ["string", "null"] },
-        "neprelucrat_mf": { "type": ["string", "null"] },
-        "neprelucrat_recom": { "type": ["string", "null"] },
         "tara": { "type": ["string", "null"] },
         "judet": { "type": ["string", "null"] },
+        "cod_judet": { "type": ["string", "null"] },
+        "cod_judet_auto": { "type": ["string", "null"] },
         "localitate": { "type": ["string", "null"] },
-        "sub_localitate": { "type": ["string", "null"] },
-        "sector": { "type": ["string", "null"] },
+        "cod_localitate": { "type": ["string", "null"] },
         "strada": { "type": ["string", "null"] },
-        "tip_strada": { "type": ["string", "null"] },
         "numar": { "type": ["string", "null"] },
-        "bloc": { "type": ["string", "null"] },
-        "scara": { "type": ["string", "null"] },
-        "etaj": { "type": ["string", "null"] },
-        "apartament": { "type": ["string", "null"] },
         "cod_postal": { "type": ["string", "null"] },
-        "cod_siruta": { "type": ["string", "null"] },
-        "sursa": { "type": ["string", "null"] },
-        "expirare": { "$ref": "#/definitions/expirare" }
+        "detalii": { "type": ["string", "null"] }
       },
       "additionalProperties": true
     },
-    "expirare": {
+    "profil": {
       "type": ["object", "null"],
       "properties": {
-        "data_actualizare": { "type": ["string", "null"] },
-        "data_expirare": { "type": ["string", "null"] },
-        "este_expirat": { "type": ["boolean", "null"] }
+        "data_inregistrare": { "type": ["string", "null"] },
+        "stare_inregistrare": { "type": ["string", "null"] },
+        "organ_fiscal": { "type": ["string", "null"] },
+        "forma_de_proprietate": { "type": ["string", "null"] },
+        "status_ro_e_factura": { "type": ["boolean", "null"] },
+        "data_inreg_ro_e_factura": { "type": ["string", "null"] },
+        "iban": { "type": ["string", "null"] }
       },
       "additionalProperties": true
     },
@@ -148,6 +140,38 @@
         "data_anulare_tva": { "type": ["string", "null"] },
         "data_operare_anulare_tva": { "type": ["string", "null"] },
         "data_interogare": { "type": ["string", "null"] }
+      },
+      "additionalProperties": true
+    },
+    "tva_incasare": {
+      "type": ["object", "null"],
+      "properties": {
+        "activ": { "type": ["boolean", "null"] },
+        "data_inceput": { "type": ["string", "null"] },
+        "data_sfarsit": { "type": ["string", "null"] },
+        "data_publicare": { "type": ["string", "null"] },
+        "data_actualizare": { "type": ["string", "null"] },
+        "tip_act": { "type": ["string", "null"] }
+      },
+      "additionalProperties": true
+    },
+    "stare_inactiv": {
+      "type": ["object", "null"],
+      "properties": {
+        "este_inactiv": { "type": ["boolean", "null"] },
+        "data_inactivare": { "type": ["string", "null"] },
+        "data_reactivare": { "type": ["string", "null"] },
+        "data_publicare": { "type": ["string", "null"] },
+        "data_radiere": { "type": ["string", "null"] }
+      },
+      "additionalProperties": true
+    },
+    "split_tva": {
+      "type": ["object", "null"],
+      "properties": {
+        "activ": { "type": ["boolean", "null"] },
+        "data_inceput": { "type": ["string", "null"] },
+        "data_anulare": { "type": ["string", "null"] }
       },
       "additionalProperties": true
     }
