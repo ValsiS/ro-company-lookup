@@ -62,7 +62,24 @@ class SummaryHelperTest extends TestCase
         $summary = RoCompanyLookup::summaryOrResult('RO123456');
 
         $this->assertSame('ok', $summary['status']);
+        $this->assertTrue($summary['valid']);
+        $this->assertTrue($summary['exists']);
         $this->assertSame(123456, $summary['cui']);
+    }
+
+    #[Test]
+    public function it_returns_summary_with_status_when_not_found(): void
+    {
+        Http::fake([
+            'webservicesp.anaf.ro/*' => Http::response($this->fixture('anaf_empty.json'), 200),
+        ]);
+
+        $summary = RoCompanyLookup::summaryOrResult('999999');
+
+        $this->assertSame('not_found', $summary['status']);
+        $this->assertFalse($summary['exists']);
+        $this->assertTrue($summary['valid']);
+        $this->assertSame('Company not found.', $summary['message']);
     }
 
     #[Test]
@@ -94,7 +111,9 @@ class SummaryHelperTest extends TestCase
 
         $summary = RoCompanyLookup::summarySafe('999999');
 
-        $this->assertSame(['exists' => false], $summary);
+        $this->assertSame('not_found', $summary['status']);
+        $this->assertFalse($summary['exists']);
+        $this->assertSame(999999, $summary['cui']);
     }
 
     #[Test]

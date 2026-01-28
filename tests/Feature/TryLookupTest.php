@@ -14,10 +14,11 @@ class TryLookupTest extends TestCase
     #[Test]
     public function it_returns_invalid_status_for_bad_cui(): void
     {
-        $result = RoCompanyLookup::tryLookup('RO');
+        $result = RoCompanyLookup::tryLookup('RO1');
 
         $this->assertSame('invalid', $result->status);
         $this->assertNull($result->data);
+        $this->assertSame('invalid_cui_too_short', $result->error);
     }
 
     #[Test]

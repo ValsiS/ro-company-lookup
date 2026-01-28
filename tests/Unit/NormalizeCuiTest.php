@@ -19,13 +19,39 @@ class NormalizeCuiTest extends TestCase
         $this->assertSame(123, NormalizeCui::normalize('RO123'));
         $this->assertSame(123, NormalizeCui::normalize('  ro 123  '));
         $this->assertSame(123, NormalizeCui::normalize('123'));
+        $this->assertSame(83723123, NormalizeCui::normalize('ro 83723123'));
     }
 
     #[Test]
     public function it_throws_for_invalid_cui(): void
     {
-        $this->expectException(InvalidCuiException::class);
+        try {
+            NormalizeCui::normalize('invalid');
+            $this->fail('Expected InvalidCuiException was not thrown.');
+        } catch (InvalidCuiException $exception) {
+            $this->assertSame(InvalidCuiException::ERROR_INVALID, $exception->error());
+        }
+    }
 
-        NormalizeCui::normalize('invalid');
+    #[Test]
+    public function it_throws_for_too_short_cui(): void
+    {
+        try {
+            NormalizeCui::normalize('RO1');
+            $this->fail('Expected InvalidCuiException was not thrown.');
+        } catch (InvalidCuiException $exception) {
+            $this->assertSame(InvalidCuiException::ERROR_TOO_SHORT, $exception->error());
+        }
+    }
+
+    #[Test]
+    public function it_throws_for_too_long_cui(): void
+    {
+        try {
+            NormalizeCui::normalize('12345678901');
+            $this->fail('Expected InvalidCuiException was not thrown.');
+        } catch (InvalidCuiException $exception) {
+            $this->assertSame(InvalidCuiException::ERROR_TOO_LONG, $exception->error());
+        }
     }
 }

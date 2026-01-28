@@ -86,6 +86,32 @@ Versioned JSON Schemas are available in:
 - `data`: `CompanySimpleData` when `status` is `ok` or `not_found`
 - `error`, `message`, `error_code` when `status` is `invalid` or `error`
 
+For invalid input, `error` can be:
+
+- `invalid_cui`
+- `invalid_cui_too_short`
+- `invalid_cui_too_long`
+
+The summary helpers (`summary`, `summarySafe`, `summaryOrResult`, and batch equivalents) return a standardized payload:
+
+```json
+{
+  "exists": true,
+  "valid": true,
+  "status": "ok",
+  "message": null,
+  "error": null,
+  "code": null,
+  "cui": 12345678,
+  "name": "EXEMPLU SRL",
+  "caen": "6201",
+  "registration_date": "01.01.2020",
+  "vat_payer": false
+}
+```
+
+`exists` is true only when `status` is `ok`. `valid` indicates whether the CUI input passed validation.
+
 ```json
 {
   "address": {

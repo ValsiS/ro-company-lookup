@@ -8,7 +8,7 @@ use Valsis\RoCompanyLookup\Facades\RoCompanyLookup;
 $company = RoCompanyLookup::lookup('RO123456');
 ```
 
-The lookup accepts `RO123`, ` ro 123 `, or `123` and normalizes to an integer CUI.
+The lookup accepts `RO123`, ` ro 123 `, or `123` and normalizes to an integer CUI. After normalization, the CUI must be between 2 and 10 digits.
 
 ## Lookup with explicit date
 
@@ -56,3 +56,26 @@ if ($result->status === 'ok') {
     $company = $result->data;
 }
 ```
+
+## Standard summary payload
+
+The summary helpers return a consistent payload shape that always includes validation and status metadata:
+
+```json
+{
+  "exists": true,
+  "valid": true,
+  "status": "ok",
+  "message": null,
+  "error": null,
+  "code": null,
+  "cui": 12345678,
+  "name": "EXEMPLU SRL",
+  "caen": "6201",
+  "registration_date": "01.01.2020",
+  "vat_payer": false
+}
+```
+
+`status` is one of `ok`, `not_found`, `invalid`, `error`. For invalid input, `error` can be `invalid_cui`, `invalid_cui_too_short`, or `invalid_cui_too_long`.
+`exists` is true only when `status` is `ok`, while `valid` reflects whether the CUI input passed validation.

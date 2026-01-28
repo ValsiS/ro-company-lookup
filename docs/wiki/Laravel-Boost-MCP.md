@@ -84,3 +84,5 @@ Open the dev app in your editor when using an MCP-capable agent. The MCP server 
 ## Notes for this repo
 
 Boost is optional and only affects AI-assisted development workflows. It does not change how `ro-company-lookup` works at runtime, but it can improve code generation and debugging when using an MCP-capable agent.
+
+For AI-assisted workflows, the summary helpers now return a standardized payload (`exists`, `valid`, `status`, and error metadata). Prefer them when you want consistent validation feedback.

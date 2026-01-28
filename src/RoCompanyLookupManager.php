@@ -206,7 +206,7 @@ class RoCompanyLookupManager extends Manager
         try {
             $data = $this->lookup($cui, $date, $includeRaw);
         } catch (InvalidCuiException $exception) {
-            return LookupResultData::invalid($exception->getMessage());
+            return LookupResultData::invalid($exception->getMessage(), $exception->error());
         } catch (CircuitOpenException $exception) {
             return LookupResultData::error($exception->getMessage(), 'circuit_open', $exception->getCode());
         } catch (LookupFailedException $exception) {
@@ -223,7 +223,7 @@ class RoCompanyLookupManager extends Manager
     {
         $data = $this->lookup($cui, $date);
 
-        return $data->summary();
+        return $this->resultFromData($data)->summary();
     }
 
     public function trySummary(int|string $cui, ?DateTimeInterface $date = null): LookupResultData
@@ -278,15 +278,7 @@ class RoCompanyLookupManager extends Manager
      */
     public function summaryOrResult(int|string $cui, ?DateTimeInterface $date = null): array
     {
-        $result = $this->tryLookup($cui, $date);
-        $payload = $result->summary();
-
-        return array_merge($payload, [
-            'status' => $result->status,
-            'message' => $result->message,
-            'error' => $result->error,
-            'code' => $result->error_code,
-        ]);
+        return $this->tryLookup($cui, $date)->summary();
     }
 
     /**
@@ -294,12 +286,7 @@ class RoCompanyLookupManager extends Manager
      */
     public function summarySafe(int|string $cui, ?DateTimeInterface $date = null): array
     {
-        $result = $this->tryLookup($cui, $date);
-        if (! $result->exists()) {
-            return ['exists' => false];
-        }
-
-        return $result->summary();
+        return $this->tryLookup($cui, $date)->summary();
     }
 
     /**
@@ -312,13 +299,7 @@ class RoCompanyLookupManager extends Manager
         $summaries = [];
 
         foreach ($results as $index => $result) {
-            $summary = $result->summary();
-            $summaries[$index] = array_merge($summary, [
-                'status' => $result->status,
-                'message' => $result->message,
-                'error' => $result->error,
-                'code' => $result->error_code,
-            ]);
+            $summaries[$index] = $result->summary();
         }
 
         return $summaries;
@@ -418,7 +399,7 @@ class RoCompanyLookupManager extends Manager
                 $valid[] = $normalized;
                 $indexMap[] = $index;
             } catch (InvalidCuiException $exception) {
-                $results[$index] = LookupResultData::invalid($exception->getMessage());
+                $results[$index] = LookupResultData::invalid($exception->getMessage(), $exception->error());
             }
         }
 

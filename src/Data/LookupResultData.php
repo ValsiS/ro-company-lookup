@@ -34,9 +34,9 @@ class LookupResultData extends Data
         return new self(self::STATUS_NOT_FOUND, $data, 'not_found', 'Company not found.');
     }
 
-    public static function invalid(string $message): self
+    public static function invalid(string $message, string $error = 'invalid_cui'): self
     {
-        return new self(self::STATUS_INVALID, null, 'invalid_cui', $message);
+        return new self(self::STATUS_INVALID, null, $error, $message);
     }
 
     public static function error(string $message, string $error = 'lookup_failed', ?int $code = null): self
@@ -64,16 +64,34 @@ class LookupResultData extends Data
      */
     public function summary(): array
     {
-        if ($this->data !== null) {
-            return $this->data->summary();
-        }
+        $exists = $this->status === self::STATUS_OK;
+        $valid = $this->status !== self::STATUS_INVALID;
 
-        return [
-            'exists' => false,
+        $summary = [
+            'exists' => $exists,
+            'valid' => $valid,
             'status' => $this->status,
             'message' => $this->message,
             'error' => $this->error,
             'code' => $this->error_code,
+            'cui' => null,
+            'name' => null,
+            'caen' => null,
+            'registration_date' => null,
+            'vat_payer' => null,
         ];
+
+        if ($this->data === null) {
+            return $summary;
+        }
+
+        $data = $this->data->summary();
+        $summary['cui'] = $data['cui'] ?? null;
+        $summary['name'] = $data['name'] ?? null;
+        $summary['caen'] = $data['caen'] ?? null;
+        $summary['registration_date'] = $data['registration_date'] ?? null;
+        $summary['vat_payer'] = $data['vat_payer'] ?? null;
+
+        return $summary;
     }
 }

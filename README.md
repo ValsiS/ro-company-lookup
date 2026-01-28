@@ -130,8 +130,8 @@ if ($result->exists()) {
 $summary = RoCompanyLookup::summary('RO123456');
 $summary = RoCompanyLookup::summaryOrNull('RO123456'); // null if not found
 $summary = RoCompanyLookup::summaryOrFail('RO123456'); // throws on invalid / not found
-$summary = RoCompanyLookup::summarySafe('RO123456');   // ['exists' => false] if not found
-$summary = RoCompanyLookup::summaryOrResult('RO123456');
+$summary = RoCompanyLookup::summarySafe('RO123456');   // standard summary payload (never throws)
+$summary = RoCompanyLookup::summaryOrResult('RO123456'); // same payload, with status/error metadata
 ```
 
 ### Batch helpers
@@ -151,6 +151,8 @@ $summaries = RoCompanyLookup::batchSummaryMap(['RO1', 'RO2']);
 $isValid = RoCompanyLookup::isValidCui('RO123456');
 $normalized = RoCompanyLookup::normalizeCui('  ro  123456 ');
 ```
+
+After normalization, the CUI must be between 2 and 10 digits. Invalid input returns standardized error codes such as `invalid_cui`, `invalid_cui_too_short`, or `invalid_cui_too_long`.
 
 ### Date formatting (global + per request)
 
@@ -203,6 +205,11 @@ Company profile (`company.profile`) includes:
 ```json
 {
   "exists": true,
+  "valid": true,
+  "status": "ok",
+  "message": null,
+  "error": null,
+  "code": null,
   "cui": 12345678,
   "name": "EXEMPLU SRL",
   "caen": "6201",
@@ -210,6 +217,8 @@ Company profile (`company.profile`) includes:
   "vat_payer": false
 }
 ```
+
+`exists` is true only when `status` is `ok`. `valid` indicates whether the CUI input passed validation.
 
 ### Full response (excerpt, RO)
 

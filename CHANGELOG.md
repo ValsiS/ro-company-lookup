@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+- Added stricter CUI validation with length checks and normalized error messages.
+- Standardized summary output with `exists`, `valid`, and `status` metadata across helpers.
+- Added explicit CUI validation error codes for too short/too long inputs.
+- Documented CUI digit length requirements and standardized summary payloads.
+
 ## [0.3.1] - 2026-01-27
 
 - Added Laravel Boost v2 MCP documentation with skills overview and local setup workflow.
