@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.3.2] - 2026-01-28
+
 - Added stricter CUI validation with length checks and normalized error messages.
 - Standardized summary output with `exists`, `valid`, and `status` metadata across helpers.
 - Added explicit CUI validation error codes for too short/too long inputs.
